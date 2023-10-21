@@ -44,11 +44,6 @@ public class AnimFloat {
         return animDistance;
     }
 
-    public void reset() {
-        this.isRunning = false;
-        this.doneFlag = false;
-    }
-
     public void setToEnd() {
         this.isRunning = false;
         this.doneFlag = true;

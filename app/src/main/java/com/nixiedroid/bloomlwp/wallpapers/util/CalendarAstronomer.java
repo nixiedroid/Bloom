@@ -2,7 +2,6 @@ package com.nixiedroid.bloomlwp.wallpapers.util;
 
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings({"SameParameterValue", "FieldCanBeLocal", "unused"})
 class CalendarAstronomer {
     public static final SolarLongitude AUTUMN_EQUINOX;
     public static final MoonAge FIRST_QUARTER;
@@ -15,15 +14,8 @@ class CalendarAstronomer {
     private transient double eclipObliquity;
     private long fGmtOffset = 0L;
     private double fLatitude = 0.0;
-    private double fLongitude = 0.0;
-    private transient double julianCentury;
     private transient double julianDay = Double.MIN_VALUE;
-    private transient double meanAnomalySun;
-    private transient double moonEclipLong;
-    private transient double moonLongitude;
-    private transient Equatorial moonPosition = null;
     private transient double siderealT0;
-    private transient double siderealTime;
     private transient double sunLongitude;
     private long time;
 
@@ -44,34 +36,23 @@ class CalendarAstronomer {
 
     public CalendarAstronomer(double longitude, double latitude) {
         this();
-        this.fLongitude = normPI(longitude * (Math.PI / 180));
+        double fLongitude = normPI(longitude * (Math.PI / 180));
         this.fLatitude = normPI(latitude * (Math.PI / 180));
-        this.fGmtOffset = (long)(this.fLongitude * 24.0 * 3600000.0 / (Math.PI * 2));
+        this.fGmtOffset = (long)(fLongitude * 24.0 * 3600000.0 / (Math.PI * 2));
     }
 
     public CalendarAstronomer(long time) {
-        this.julianCentury = Double.MIN_VALUE;
         this.sunLongitude = Double.MIN_VALUE;
-        this.meanAnomalySun = Double.MIN_VALUE;
-        this.moonLongitude = Double.MIN_VALUE;
-        this.moonEclipLong = Double.MIN_VALUE;
         this.eclipObliquity = Double.MIN_VALUE;
         this.siderealT0 = Double.MIN_VALUE;
-        this.siderealTime = Double.MIN_VALUE;
         this.time = time;
     }
 
     private void clearCache() {
         this.julianDay = Double.MIN_VALUE;
-        this.julianCentury = Double.MIN_VALUE;
         this.sunLongitude = Double.MIN_VALUE;
-        this.meanAnomalySun = Double.MIN_VALUE;
-        this.moonLongitude = Double.MIN_VALUE;
-        this.moonEclipLong = Double.MIN_VALUE;
         this.eclipObliquity = Double.MIN_VALUE;
-        this.siderealTime = Double.MIN_VALUE;
         this.siderealT0 = Double.MIN_VALUE;
-        this.moonPosition = null;
     }
 
     private double eclipticObliquity() {
@@ -110,7 +91,7 @@ class CalendarAstronomer {
         return d - d2 * Math.floor(d / d2);
     }
 
-    private long riseOrSet(CoordFunc coordFunc, boolean bl, double d, double d2, long l) {
+    private long riseOrSet(CoordFunc coordFunc, boolean bl, long l) {
         double d3;
         Equatorial equatorial;
         long l2;
@@ -129,7 +110,7 @@ class CalendarAstronomer {
         } while (++n < 5 && Math.abs(l3 - l2) > l);
         double d4 = Math.cos(equatorial.declination);
         d3 = Math.acos(Math.sin(this.fLatitude) / d4);
-        l3 = (long)(Math.asin(Math.sin(d / 2.0 + d2) / Math.sin(d3)) * 240.0 * 57.29577951308232 / d4 * 1000.0);
+        l3 = (long)(Math.asin(Math.sin(0.009302604913129777 / 2.0 + 0.009890199094634533) / Math.sin(d3)) * 240.0 * 57.29577951308232 / d4 * 1000.0);
         l2 = this.time;
         l = l3;
         if (bl) {
@@ -138,15 +119,15 @@ class CalendarAstronomer {
         return l2 + l;
     }
 
-    private double trueAnomaly(double d, double d2) {
+    private double trueAnomaly(double d) {
         double d3;
         double d4;
         double d5 = d;
         do {
-            d4 = d5 - Math.sin(d5) * d2 - d;
-            d5 = d3 = d5 - d4 / (1.0 - Math.cos(d5) * d2);
+            d4 = d5 - Math.sin(d5) * 0.016713 - d;
+            d5 = d3 = d5 - d4 / (1.0 - Math.cos(d5) * 0.016713);
         } while (Math.abs(d4) > 1.0E-5);
-        return Math.atan(Math.tan(d3 / 2.0) * Math.sqrt((d2 + 1.0) / (1.0 - d2))) * 2.0;
+        return Math.atan(Math.tan(d3 / 2.0) * Math.sqrt((0.016713 + 1.0) / (1.0 - 0.016713))) * 2.0;
     }
 
     public final Equatorial eclipticToEquatorial(double d, double d2) {
@@ -171,14 +152,13 @@ class CalendarAstronomer {
         if (this.sunLongitude == Double.MIN_VALUE) {
             double[] dArray = this.getSunLongitude(this.getJulianDay());
             this.sunLongitude = dArray[0];
-            this.meanAnomalySun = dArray[1];
         }
         return this.sunLongitude;
     }
 
     double[] getSunLongitude(double d) {
         d = CalendarAstronomer.norm2PI(CalendarAstronomer.norm2PI((d - 2447891.5) * 0.017202791632524146) + 4.87650757829735 - 4.935239984568769);
-        return new double[]{CalendarAstronomer.norm2PI(this.trueAnomaly(d, 0.016713) + 4.935239984568769), d};
+        return new double[]{CalendarAstronomer.norm2PI(this.trueAnomaly(d) + 4.935239984568769), d};
     }
 
     public Equatorial getSunPosition() {
@@ -191,7 +171,7 @@ class CalendarAstronomer {
         long l3 = (l + l2) / 86400000L;
         long l4 = bl ? -6L : 6L;
         this.setTime(l3 * 86400000L - l2 + 43200000L + l4 * 3600000L);
-        l4 = this.riseOrSet(CalendarAstronomer.this::getSunPosition, bl, 0.009302604913129777, 0.009890199094634533, 5000L);
+        l4 = this.riseOrSet(CalendarAstronomer.this::getSunPosition, bl, 5000L);
         this.setTime(l);
         return l4;
     }

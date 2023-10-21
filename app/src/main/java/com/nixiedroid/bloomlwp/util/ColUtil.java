@@ -3,11 +3,6 @@ package com.nixiedroid.bloomlwp.util;
 import android.graphics.Color;
 
 public class ColUtil {
-    public static void intToRgb(int n, float[] rgbValues, int n2) {
-        rgbValues[n2] = (float)Color.red(n) / 255.0f;
-        rgbValues[n2 + 1] = (float)Color.green(n) / 255.0f;
-        rgbValues[n2 + 2] = (float)Color.blue(n) / 255.0f;
-    }
 
     public static float[] intToRgb(int n) {
         int n2 = Color.red(n);
@@ -20,19 +15,6 @@ public class ColUtil {
         fArray3[0] = MathUtil.lerp(f, fArray[0], fArray2[0]);
         fArray3[1] = MathUtil.lerp(f, fArray[1], fArray2[1]);
         fArray3[2] = MathUtil.lerp(f, fArray[2], fArray2[2]);
-    }
-
-    public static float[] lerpRgb(float f, float[] fArray, float[] fArray2) {
-        return new float[]{MathUtil.lerp(f, fArray[0], fArray2[0]), MathUtil.lerp(f, fArray[1], fArray2[1]), MathUtil.lerp(f, fArray[2], fArray2[2])};
-    }
-
-    public static int multiply(int n, int n2) {
-        float[] fArray = ColUtil.intToRgb(n);
-        float[] fArray2 = ColUtil.intToRgb(n2);
-        fArray[0] = fArray[0] * fArray2[0];
-        fArray[1] = fArray[1] * fArray2[1];
-        fArray[2] = fArray[2] * fArray2[2];
-        return ColUtil.rgbToInt(fArray);
     }
 
     public static int rgbToInt(float[] fArray) {

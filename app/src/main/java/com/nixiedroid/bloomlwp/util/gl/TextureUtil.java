@@ -19,11 +19,6 @@ public class TextureUtil {
         options.inScaled = false;
         Bitmap decodeResource = BitmapFactory.decodeResource(context.getResources(), textureResId, options);
         L.v(decodeResource.getWidth() + "x" + decodeResource.getHeight());
-        if (decodeResource == null) {
-            L.e("Resource ID " + textureResId + " could not be decoded.");
-            GLES20.glDeleteTextures(1, responseArray, 0);
-            return 0;
-        }
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, responseArray[0]);
         if (isMipmap) {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR_MIPMAP_LINEAR);

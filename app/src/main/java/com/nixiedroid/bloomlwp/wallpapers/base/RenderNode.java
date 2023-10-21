@@ -21,10 +21,6 @@ public abstract class RenderNode {
         }
     }
 
-    public final void removeChildNodes() {
-        this.childNodes.clear();
-    }
-
     protected void update() {
         this.doUpdate();
         for (RenderNode childNode : this.childNodes) {

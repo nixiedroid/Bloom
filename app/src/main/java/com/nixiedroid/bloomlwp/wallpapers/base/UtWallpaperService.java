@@ -179,7 +179,7 @@ extends GLWallpaperService {
         public void onTouchEvent(MotionEvent motionEvent) {
             if (handlesTouchesAndGestures() && renderer != null) {
                 gestureDetector.onTouchEvent(motionEvent);
-                renderer.onTouchEvent(motionEvent);
+                renderer.onTouchEvent();
             }
         }
 
@@ -222,7 +222,6 @@ extends GLWallpaperService {
                         renderer.onScreenOn();
                         break;
                     case "android.intent.action.USER_PRESENT":
-                        TimeUtil.setUnlockTime();
                         L.d("user_present");
                         renderer.onUserPresent();
                         break;
@@ -234,7 +233,7 @@ extends GLWallpaperService {
         extends GestureDetector.SimpleOnGestureListener {
             @Override
             public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
-                renderer.onFling(motionEvent, motionEvent2, f, f);
+                renderer.onFling();
                 return true;
             }
         }

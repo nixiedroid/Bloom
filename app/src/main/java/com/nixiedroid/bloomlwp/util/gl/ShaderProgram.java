@@ -11,8 +11,5 @@ extends RenderNode {
         this.programId = ShaderUtil.makeProgram(context, vertexShader, fragmentShader);
     }
 
-    public int programId() {
-        return this.programId;
-    }
 }
 

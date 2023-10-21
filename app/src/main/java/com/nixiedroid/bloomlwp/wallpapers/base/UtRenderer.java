@@ -9,9 +9,7 @@ import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.util.MathUtil;
 import com.nixiedroid.bloomlwp.util.Vec3f;
-import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -56,24 +54,12 @@ public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Ren
         return engine.glSurfaceView();
     }
 
-    public Vec3f gravity() {
-        return gravity;
-    }
-
     public boolean isLockScreen() {
         return isLockScreen;
     }
 
-    public boolean isPortrait() {
-        return viewportHeight > viewportWidth;
-    }
-
     public boolean isPreview() {
         return isPreview;
-    }
-
-    public float multiplier1440() {
-        return multiplier1440;
     }
 
     public abstract WallpaperColors onComputeWallpaperColors();
@@ -95,7 +81,7 @@ public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Ren
         scheduler.onDrawFrameEnd();
     }
 
-    protected void onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
+    protected void onFling() {
     }
 
     protected void onGravitySensor(float f, float f2, float f3) {
@@ -154,7 +140,7 @@ public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Ren
         }
     }
 
-    protected void onTouchEvent(MotionEvent motionEvent) {
+    protected void onTouchEvent() {
     }
 
     protected void onUserPresent() {
@@ -192,28 +178,8 @@ public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Ren
     public void setIsPreview(boolean bl) {
         isPreview = bl;
     }
-
-    public int unlockTransitionDuration() {
-        return 1000;
-    }
-
-    public float unlockTransitionProgress() {
-        if (isLockScreen()) {
-            return 0.0f;
-        }
-        if (isPreview) {
-            return 1.0f;
-        }
-        return MathUtil.clamp((float) TimeUtil.elapsedRealTimeSince(TimeUtil.unlockTime())
-                / (float) unlockTransitionDuration());
-    }
-
     public int viewportHeight() {
         return viewportHeight;
-    }
-
-    public int viewportShortSide() {
-        return viewportShortSide;
     }
 
     public int viewportWidth() {
