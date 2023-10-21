@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wallpaper android:description="@string/orbit_description" android:thumbnail="@drawable/orbit3_thumb" android:author="@string/collection_label" android:showMetadataInPreview="true"
+  xmlns:android="http://schemas.android.com/apk/res/android" />
