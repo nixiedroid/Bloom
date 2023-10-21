@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.orbit;
 
 import com.nixiedroid.bloomlwp.util.L;

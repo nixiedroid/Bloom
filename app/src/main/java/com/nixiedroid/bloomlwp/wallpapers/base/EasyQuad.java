@@ -61,14 +61,14 @@ extends Quad {
     }
 
     @Override
-    public void setBasePositions(float f, float f2, float f3, float f4) {
-        super.setBasePositions(f, f2, f3, f4);
+    public void setBasePositions(float x, float y, float z, float d) {
+        super.setBasePositions(x, y, z, d);
         this.positionsDirty = true;
     }
 
     @Override
-    public void setLowerLeftRgb(float f, float f2, float f3, float f4) {
-        super.setLowerLeftRgb(f, f2, f3, f4);
+    public void setLowerLeftRgb(float x, float y, float z, float d) {
+        super.setLowerLeftRgb(x, y, z, d);
         this.colorsDirty = true;
     }
 
@@ -78,10 +78,10 @@ extends Quad {
         this.colorsDirty = true;
     }
 
-    public void setProgramIds(int n, int n2, int n3) {
-        this.positionAttributeId = n;
-        this.colorAttributeId = n2;
-        this.textureCoordAttributeId = n3;
+    public void setProgramIds(int positionAttributeId, int colorAttributeId, int textureCoordAttributeId) {
+        this.positionAttributeId = positionAttributeId;
+        this.colorAttributeId = colorAttributeId;
+        this.textureCoordAttributeId = textureCoordAttributeId;
         this.hasSetAttributesIds = true;
     }
 

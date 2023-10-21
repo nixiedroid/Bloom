@@ -11,24 +11,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class TextResourceReader {
-    public static String readTextFileFromResource(Context context, int i) {
-        StringBuilder sb = new StringBuilder();
-        try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(i)));
+    public static String readTextFileFromResource(Context context, int resourceId) {
+        StringBuilder resourceString = new StringBuilder();
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(context.getResources().openRawResource(resourceId)))){
+            String line;
             while (true) {
-                String readLine = bufferedReader.readLine();
-                if (readLine == null) {
-                    return sb.toString();
+                line = bufferedReader.readLine();
+                if (line == null) {
+                    return resourceString.toString();
                 }
-                sb.append(readLine);
-                sb.append('\n');
+                resourceString.append(line);
+                resourceString.append('\n');
             }
         } catch (Resources.NotFoundException e) {
-            throw new RuntimeException("Resource not found: " + i, e);
-        } catch (IOException e2) {
-            throw new RuntimeException("Could not open resource: " + i, e2);
+            throw new RuntimeException("Resource not found: " + resourceId, e);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not open resource: " + resourceId, e);
         }
     }
-
 }
 

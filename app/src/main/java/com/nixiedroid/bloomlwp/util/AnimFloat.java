@@ -10,13 +10,14 @@ public class AnimFloat {
     private boolean isRunning = false;
     private long startNs;
     private final float startValue;
+    @SuppressWarnings("SpellCheckingInspection")
     private final Interpolator terp;
 
     public AnimFloat(float startValue, float endValue, long durationS, long delayS, Interpolator interpolator) {
         this.startValue = startValue;
         this.endValue = endValue;
-        this.durationNs = durationS * 1000000L;
-        this.delayNs = delayS * 1000000L;
+        this.durationNs = durationS * 1000_000;
+        this.delayNs = delayS * 1000_000;
         this.terp = interpolator;
     }
 
@@ -35,12 +36,12 @@ public class AnimFloat {
         if (!this.isRunning) {
             return 0.0f;
         }
-        float f = MathUtil.clamp((float)(System.nanoTime() - this.startNs - this.delayNs) / (float)this.durationNs);
-        if (f == 1.0f && !this.doneFlag) {
+        float animDistance = MathUtil.clamp((float)(System.nanoTime() - this.startNs - this.delayNs) / (float)this.durationNs);
+        if (animDistance == 1.0f && !this.doneFlag) {
             this.isRunning = false;
             this.doneFlag = true;
         }
-        return f;
+        return animDistance;
     }
 
     public void reset() {
@@ -51,7 +52,7 @@ public class AnimFloat {
     public void setToEnd() {
         this.isRunning = false;
         this.doneFlag = true;
-        this.startNs = 0L;
+        this.startNs = 0;
     }
 
     public void start() {
@@ -61,8 +62,8 @@ public class AnimFloat {
     }
 
     public float value() {
-        float f = MathUtil.clamp(this.percent());
-        return MathUtil.lerp(this.terp.getInterpolation(f), this.startValue, this.endValue);
+        float animDistance = MathUtil.clamp(this.percent());
+        return MathUtil.lerp(this.terp.getInterpolation(animDistance), this.startValue, this.endValue);
     }
 }
 

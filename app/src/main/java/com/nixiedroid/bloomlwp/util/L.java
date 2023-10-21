@@ -12,45 +12,54 @@ public class L {
         }
     }
 
-    public static void d(String string2) {
+    public static void d(String message) {
         if (levelFilter <= 1) {
-            L.output(string2, 1, Thread.currentThread().getStackTrace());
+            L.output(message, 1, Thread.currentThread().getStackTrace());
         }
     }
 
-    public static void e(String string2) {
+    public static void e(String message) {
         if (levelFilter <= 5) {
-            L.output(string2, 4, Thread.currentThread().getStackTrace());
+            L.output(message, 4, Thread.currentThread().getStackTrace());
         }
     }
 
-    public static void e(String string2, boolean bl) {
+    public static void v(String message) {
+        if (levelFilter <= 0) {
+            L.output(message, 0, Thread.currentThread().getStackTrace());
+        }
+    }
+
+    public static void w(String message) {
+        if (levelFilter <= 3) {
+            L.output(message, 3, Thread.currentThread().getStackTrace());
+        }
+    }
+    public static void e(String message, boolean doPrintStackTrace) {
         if (levelFilter <= 5) {
-            L.output(string2, 4, Thread.currentThread().getStackTrace());
-            if (bl) {
+            L.output(message, 4, Thread.currentThread().getStackTrace());
+            if (doPrintStackTrace) {
                 L.printStackTrace();
             }
         }
     }
 
-    private static void output(String str, int i, StackTraceElement[] stackTraceElementArr) {
-        String str2 = stackTraceElementArr[3].getClassName();
-        String methodName = stackTraceElementArr[3].getMethodName();
+    private static void output(String message, int level, StackTraceElement[] stackTrace) {
         if (decorationEnabled) {
-            str = str2 + "." + methodName + "() " + str;
+            message = stackTrace[stackTrace.length-1].getClassName() + "() " + message;
         }
-        if (i == 0) {
-            Log.v("zz", str);
-        } else if (i == 1) {
-            Log.d("zz", str);
-        } else if (i == 2) {
-            Log.i("zz", str);
-        } else if (i == 3) {
-            Log.w("zz", str);
-        } else if (i != 4) {
-            Log.v("zz", str);
+        if (level == 0) {
+            Log.v("zz", message);
+        } else if (level == 1) {
+            Log.d("zz", message);
+        } else if (level == 2) {
+            Log.i("zz", message);
+        } else if (level == 3) {
+            Log.w("zz", message);
+        } else if (level != 4) {
+            Log.v("zz", message);
         } else {
-            Log.e("zz", str);
+            Log.e("zz", message);
         }
     }
 
@@ -59,28 +68,17 @@ public class L {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         StringBuilder str = new StringBuilder();
         for (int i = 4; i < stackTrace.length; i++) {
-            str = new StringBuilder((
-                    str
-                            + "    "
-                            + stackTrace[i].getClassName()
-                            + "." + stackTrace[i].getMethodName()
-                            + " @ " + stackTrace[i].getLineNumber())
-                    + "\n");
+            str = new StringBuilder(
+                    str + "    " +
+                    stackTrace[i].getClassName() + "." +
+                    stackTrace[i].getMethodName() + " @ " +
+                    stackTrace[i].getLineNumber() + "\n"
+            );
         }
         Log.e("zz", str.toString());
 
     }
 
-    public static void v(String string2) {
-        if (levelFilter <= 0) {
-            L.output(string2, 0, Thread.currentThread().getStackTrace());
-        }
-    }
 
-    public static void w(String string2) {
-        if (levelFilter <= 3) {
-            L.output(string2, 3, Thread.currentThread().getStackTrace());
-        }
-    }
 }
 

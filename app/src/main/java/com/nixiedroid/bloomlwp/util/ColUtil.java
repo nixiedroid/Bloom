@@ -3,10 +3,10 @@ package com.nixiedroid.bloomlwp.util;
 import android.graphics.Color;
 
 public class ColUtil {
-    public static void intToRgb(int n, float[] fArray, int n2) {
-        fArray[n2] = (float)Color.red(n) / 255.0f;
-        fArray[n2 + 1] = (float)Color.green(n) / 255.0f;
-        fArray[n2 + 2] = (float)Color.blue(n) / 255.0f;
+    public static void intToRgb(int n, float[] rgbValues, int n2) {
+        rgbValues[n2] = (float)Color.red(n) / 255.0f;
+        rgbValues[n2 + 1] = (float)Color.green(n) / 255.0f;
+        rgbValues[n2 + 2] = (float)Color.blue(n) / 255.0f;
     }
 
     public static float[] intToRgb(int n) {

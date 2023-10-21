@@ -16,9 +16,8 @@ import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public abstract class UtRenderer
-        extends RenderNode
-        implements GLSurfaceView.Renderer {
+public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Renderer {
+    private final RenderScheduler scheduler;
     protected int displayHeight;
     protected int displayWidth;
     protected UtWallpaperService.UtEngine engine;
@@ -35,112 +34,110 @@ public abstract class UtRenderer
     protected int viewportShortSide;
     protected int viewportWidth;
     private boolean isFirstSurfaceRedraw = true;
-    private final RenderScheduler scheduler;
+
     @SuppressWarnings("deprecation")
     public UtRenderer() {
         L.d();
-        this.scheduler = new RenderScheduler(this);
+        scheduler = new RenderScheduler(this);
         DisplayManager displayManager = (DisplayManager) App.get().getSystemService(Context.DISPLAY_SERVICE);
         Point point = new Point();
         displayManager.getDisplay(0).getSize(point);
-        this.displayWidth = point.x;
-        this.displayHeight = point.y;
+        displayWidth = point.x;
+        displayHeight = point.y;
     }
 
     public int displayShortSide() {
-        return Math.min(this.displayWidth, this.displayHeight);
+        return Math.min(displayWidth, displayHeight);
     }
 
     public abstract int frameInterval();
 
     public GLSurfaceView glSurfaceView() {
-        return this.engine.glSurfaceView();
+        return engine.glSurfaceView();
     }
 
     public Vec3f gravity() {
-        return this.gravity;
+        return gravity;
     }
 
     public boolean isLockScreen() {
-        return this.isLockScreen;
+        return isLockScreen;
     }
 
     public boolean isPortrait() {
-        return this.viewportHeight > this.viewportWidth;
+        return viewportHeight > viewportWidth;
     }
 
     public boolean isPreview() {
-        return this.isPreview;
+        return isPreview;
     }
 
     public float multiplier1440() {
-        return this.multiplier1440;
+        return multiplier1440;
     }
 
     public abstract WallpaperColors onComputeWallpaperColors();
 
     public void onDestroy() {
         L.d();
-        this.scheduler.kill();
+        scheduler.kill();
     }
 
     @Override
     public void onDrawFrame(GL10 gL10) {
         //Maybe remove nanotime?
-        this.scheduler.onDrawFrameStart();
-        System.nanoTime();
-        this.update();
-        System.nanoTime();
-        this.draw();
-        System.nanoTime();
-        this.scheduler.onDrawFrameEnd();
+        scheduler.onDrawFrameStart();
+        //System.nanoTime();
+        update();
+        //System.nanoTime();
+        draw();
+        //System.nanoTime();
+        scheduler.onDrawFrameEnd();
     }
 
     protected void onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
     }
 
     protected void onGravitySensor(float f, float f2, float f3) {
-        Vec3f vec3f = this.lastGravity;
-        if (vec3f == null) {
-            this.lastGravity = new Vec3f(f, f2, f3);
+        if (lastGravity == null) {
+            lastGravity = new Vec3f(f, f2, f3);
         } else {
-            vec3f.set(this.gravity);
+            lastGravity.set(gravity);
         }
-        this.gravity.set(f, f2, f3);
+        gravity.set(f, f2, f3);
     }
 
     protected void onNotVisible() {
         L.d();
-        this.isVisible = false;
-        this.scheduler.setVisible(false);
-        this.scheduler.cancel();
+        isVisible = false;
+        scheduler.setVisible(false);
+        scheduler.cancel();
     }
 
     public void onOffsetChanged(float f) {
-        this.homeOffset = f;
+        homeOffset = f;
     }
 
     protected void onScreenOff() {
         L.d();
-        this.scheduler.cancel();
+        scheduler.cancel();
     }
 
     protected void onScreenOn() {
-        L.d("and is visible? " +
-                this.isVisible);
-        if (this.isVisible) {
-            this.schedulerRequestNow();
+        L.d("and is visible? " + isVisible);
+        if (isVisible) {
+            schedulerRequestNow();
         }
     }
 
     @Override
-    public void onSurfaceChanged(GL10 object, int n, int n2) {
-        L.d(n + "x" + n2);
-        this.viewportWidth = n;
-        this.viewportHeight = n2;
-        this.viewportShortSide = Math.min(this.viewportWidth, this.viewportHeight);
-        this.multiplier1440 = (float) this.viewportShortSide / 1440.0f;
-        this.surfaceChangeTime = System.currentTimeMillis();
+    public void onSurfaceChanged(GL10 object, int displayWidth, int displayHeight) {
+        L.d(displayWidth + "x" + displayHeight);
+        viewportWidth = displayWidth;
+        viewportHeight = displayHeight;
+        viewportShortSide = Math.min(viewportWidth, viewportHeight);
+        multiplier1440 = (float) viewportShortSide / 1440.0f;
+        surfaceChangeTime = System.currentTimeMillis();
     }
 
     @Override
@@ -151,11 +148,10 @@ public abstract class UtRenderer
     }
 
     public void onSurfaceRedrawNeeded() {
-        if (!this.isFirstSurfaceRedraw) {
-            return;
+        if (isFirstSurfaceRedraw) {
+            isFirstSurfaceRedraw = false;
+            L.d();
         }
-        this.isFirstSurfaceRedraw = false;
-        L.d();
     }
 
     protected void onTouchEvent(MotionEvent motionEvent) {
@@ -163,38 +159,38 @@ public abstract class UtRenderer
 
     protected void onUserPresent() {
         L.d();
-        if (this.isLockScreen()) {
+        if (isLockScreen()) {
             L.d("and was at lock screen");
-            this.isLockScreen = false;
-            this.scheduler.requestRenderNow();
+            isLockScreen = false;
+            scheduler.requestRenderNow();
         }
     }
 
     protected void onVisible() {
         L.d();
-        this.isVisible = true;
-        this.scheduler.setVisible(true);
-        this.scheduler.requestRenderNow();
+        isVisible = true;
+        scheduler.setVisible(true);
+        scheduler.requestRenderNow();
     }
 
     protected void onVisibleAtLockScreen() {
         L.d();
-        this.isVisible = true;
-        this.isLockScreen = true;
-        this.scheduler.setVisible(true);
-        this.scheduler.requestRenderNow();
+        isVisible = true;
+        isLockScreen = true;
+        scheduler.setVisible(true);
+        scheduler.requestRenderNow();
     }
 
     public void schedulerRequestNow() {
-        this.scheduler.requestRenderNow();
+        scheduler.requestRenderNow();
     }
 
     public void setEngine(UtWallpaperService.UtEngine utEngine) {
-        this.engine = utEngine;
+        engine = utEngine;
     }
 
     public void setIsPreview(boolean bl) {
-        this.isPreview = bl;
+        isPreview = bl;
     }
 
     public int unlockTransitionDuration() {
@@ -202,25 +198,26 @@ public abstract class UtRenderer
     }
 
     public float unlockTransitionProgress() {
-        if (this.isLockScreen()) {
+        if (isLockScreen()) {
             return 0.0f;
         }
-        if (this.isPreview) {
+        if (isPreview) {
             return 1.0f;
         }
-        return MathUtil.clamp((float) TimeUtil.elapsedRealTimeSince(TimeUtil.unlockTime()) / (float) this.unlockTransitionDuration());
+        return MathUtil.clamp((float) TimeUtil.elapsedRealTimeSince(TimeUtil.unlockTime())
+                / (float) unlockTransitionDuration());
     }
 
     public int viewportHeight() {
-        return this.viewportHeight;
+        return viewportHeight;
     }
 
     public int viewportShortSide() {
-        return this.viewportShortSide;
+        return viewportShortSide;
     }
 
     public int viewportWidth() {
-        return this.viewportWidth;
+        return viewportWidth;
     }
 }
 

@@ -215,7 +215,15 @@ public class ShadowProgram
                 var3 = 0.0F;
             }
 
-            MathUtil.pointOnCircle(MathUtil.clamp(MathUtil.getLength(var3, var2), 0.0F, this.renderer.multiplier1440() * 27.5F * ((float) (3 - var1) / 3.0F)), MathUtil.getAngle(var3, var2), this.dragOffsetTargets[var1]);
+            MathUtil.pointOnCircle(
+                    MathUtil.clamp(
+                            MathUtil.getLength(var3, var2),
+                            0.0F,
+                            this.renderer.multiplier1440() * 27.5F * ((float) (3 - var1) / 3.0F)
+                    ),
+                    MathUtil.getAngle(var3, var2),
+                    this.dragOffsetTargets[var1]
+            );
         } else if (!var7) {
             var15 = this.dragOffsetTargets;
             var15[var1].x = 0.0F;

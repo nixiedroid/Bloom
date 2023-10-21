@@ -16,13 +16,13 @@ public class RenderScheduler {
         handler = new Handler();
     }
 
-    private void scheduleNext(int n) {
-        if (n <= 0) {
+    private void scheduleNext(int millis) {
+        if (millis <= 0) {
             this.runnable.run();
-        } else {
-            this.handler.removeCallbacks(this.runnable);
-            this.handler.postDelayed(this.runnable, n);
+            return;
         }
+        this.handler.removeCallbacks(this.runnable);
+        this.handler.postDelayed(this.runnable, millis);
     }
 
     public void cancel() {
@@ -38,7 +38,10 @@ public class RenderScheduler {
         if (!this.visible) {
             return;
         }
-        this.scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f - (float) (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000.0f));
+//        this.scheduleNext(
+//                (int) ((float) this.renderer.frameInterval() * 16.666666f - (float) (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000.0f)
+//        );
+        this.scheduleNext((this.renderer.frameInterval() << 4) - (int)  (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000);
     }
 
     public void onDrawFrameStart() {
@@ -46,12 +49,13 @@ public class RenderScheduler {
     }
 
     public void requestRenderNow() {
-        this.renderer.glSurfaceView().requestRender();
-        this.scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f));
+        renderer.glSurfaceView().requestRender();
+        scheduleNext(this.renderer.frameInterval() << 4);
+        //scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f));
     }
 
-    public void setVisible(boolean bl) {
-        this.visible = bl;
+    public void setVisible(boolean isVisible) {
+        this.visible = isVisible;
     }
 }
 

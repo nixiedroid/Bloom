@@ -20,30 +20,30 @@ import com.nixiedroid.bloomlwp.util.Vec3f;
 import com.nixiedroid.bloomlwp.wallpapers.Constants;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class ShadowRenderer
-extends UtRenderer {
+        extends UtRenderer {
     static final Vec3f RESTING_GRAVITY = new Vec3f(0.0f, 0.66f, 1.0f);
+    private final boolean isOscillationDisabled;
+    private final BroadcastReceiver weatherBroadcastReceiver;
     private PointF downPoint;
     private long downTime;
     private PointF dragPoint;
     private float flingFactor;
     private boolean flingFlag;
     private float gravityAccumulator;
-    private boolean isOscillationDisabled;
     private boolean isResting;
     private long lastShadowPulseTimeCheck;
     private ShadowProgram program;
     private long shadowPulseTime;
     private long upTime;
-    private BroadcastReceiver weatherBroadcastReceiver;
 
     public ShadowRenderer() {
-        boolean bl = true;
         this.isResting = true;
-        this.weatherBroadcastReceiver = new BroadcastReceiver(){
+        this.weatherBroadcastReceiver = new BroadcastReceiver() {
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -62,7 +62,7 @@ extends UtRenderer {
         this.gravity.set(RESTING_GRAVITY);
         IntentFilter intentFilter = new IntentFilter("weather_result");
         LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.weatherBroadcastReceiver, intentFilter);
-        bl2 = App.get().shadowTestSettings != null && App.get().shadowTestSettings.isPulseDisabled ? bl : false;
+        bl2 = App.get().shadowTestSettings != null && App.get().shadowTestSettings.isPulseDisabled;
         this.isOscillationDisabled = bl2;
     }
 
@@ -101,7 +101,8 @@ extends UtRenderer {
     @Override
     public int frameInterval() {
         int n;
-        block1: {
+        block1:
+        {
             ShadowProgram shadowProgram = this.program;
             n = 1;
             if (shadowProgram == null) {
@@ -142,30 +143,17 @@ extends UtRenderer {
 
     @Override
     protected void onFling(MotionEvent paramMotionEvent1, MotionEvent paramMotionEvent2, float paramFloat1, float paramFloat2) {
-        float f = ViewConfiguration.get((Context)App.get()).getScaledMaximumFlingVelocity();
+        float f = ViewConfiguration.get((Context) App.get()).getScaledMaximumFlingVelocity();
         paramFloat1 = (new PointF(paramFloat1, paramFloat2)).length() / f;
         if (paramFloat1 < 0.05F) {
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("ignoring weak fling ");
-            stringBuilder.append(paramFloat1);
-            L.v(stringBuilder.toString());
+            L.v("ignoring weak fling " + paramFloat1);
         } else if (System.currentTimeMillis() - this.downTime <= 333L) {
             MathUtil.getAngle(paramMotionEvent2.getX() - (downPoint()).x, paramMotionEvent2.getY() - (downPoint()).y);
             paramFloat2 = MathUtil.clamp(MathUtil.getLength(paramMotionEvent2.getX() - (downPoint()).x, paramMotionEvent2.getY() - (downPoint()).y) / viewportShortSide() * 1.25F);
             this.flingFactor = Math.max(paramFloat1, paramFloat2);
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("fling ratio ");
-            stringBuilder.append(paramFloat1);
-            stringBuilder.append(" distance factor ");
-            stringBuilder.append(paramFloat2);
-            stringBuilder.append(" = ");
-            stringBuilder.append(this.flingFactor);
-            L.v(stringBuilder.toString());
+            L.v("fling ratio " + paramFloat1 + " distance factor " +  paramFloat2 +  " = " + flingFactor);
             this.flingFactor = MathUtil.normalize(this.flingFactor, 0.0F, 0.66F, true);
-            stringBuilder = new StringBuilder();
-            stringBuilder.append("adjusted fling factor ");
-            stringBuilder.append(this.flingFactor);
-            L.v(stringBuilder.toString());
+            L.v("adjusted fling factor " + flingFactor);
             this.flingFlag = true;
             schedulerRequestNow();
         }

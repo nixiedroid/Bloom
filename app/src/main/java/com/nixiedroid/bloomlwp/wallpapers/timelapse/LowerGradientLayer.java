@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.timelapse;
 
 import android.opengl.GLES20;
@@ -15,11 +12,10 @@ extends Layer {
     private float height;
     private final boolean isTransitionLayer;
     private final TimelapseProgram program;
-    private DoubleEasyQuad quad;
+    private final DoubleEasyQuad quad;
     private final TimelapseRenderer renderer;
     private final int textureId;
     private float unlockStartY;
-    private int viewportHeight;
     private int viewportWidth;
     private float y;
 
@@ -34,11 +30,9 @@ extends Layer {
 
     private void updateAlphas() {
         if (this.isTransitionLayer) {
-            float f = this.renderer.isLockScreen() ? 1.0f : this.renderer.unlockBottomFadeoutAnimValue();
-            this.alpha = f;
+            this.alpha = this.renderer.isLockScreen() ? 1.0f : this.renderer.unlockBottomFadeoutAnimValue();
         } else {
-            float f = this.renderer.isLockScreen() ? 0.0f : this.renderer.unlockBottomFadeInAnimValue();
-            this.alpha = f;
+            this.alpha = this.renderer.isLockScreen() ? 0.0f : this.renderer.unlockBottomFadeInAnimValue();
         }
     }
 
@@ -48,10 +42,17 @@ extends Layer {
 
     private void updatePositions() {
         float f = this.y;
-        this.y = this.isTransitionLayer ? this.defaultY : (this.renderer.isLockScreen() ? this.unlockStartY : MathUtil.lerp(this.renderer.unlockBottomSlideAnimValue(), this.unlockStartY, this.defaultY));
-        float f2 = this.y;
-        if (f2 != f) {
-            this.quad.setBasePositions(0.0f, f2, this.viewportWidth, this.height + f2);
+        if (this.isTransitionLayer){
+            this.y = this.defaultY;
+        } else {
+            if (this.renderer.isLockScreen()){
+                this.y = this.unlockStartY;
+            } else {
+                this.y = MathUtil.lerp(this.renderer.unlockBottomSlideAnimValue(), this.unlockStartY, this.defaultY);
+            }
+        }
+        if (this.y != f) {
+            this.quad.setBasePositions(0.0f, this.y, this.viewportWidth, this.height + this.y);
         }
     }
 
@@ -77,10 +78,9 @@ extends Layer {
 
     public void setDimensions(int n, int n2) {
         this.viewportWidth = n;
-        n = this.viewportHeight = n2;
-        this.defaultY = (float)n * 0.296875f;
-        this.height = (float)n * 0.703125f;
-        this.unlockStartY = (float)n * 0.66f;
+        this.defaultY = (float)n2 * 0.296875f;
+        this.height = (float)n2 * 0.703125f;
+        this.unlockStartY = (float)n2 * 0.66f;
         this.y = this.defaultY - 1.0f;
     }
 }

@@ -10,51 +10,50 @@ import com.nixiedroid.bloomlwp.util.L;
 public class ShaderUtil {
     public static int buildProgram(String vertexCode, String fragmentCode) {
         int programId = linkProgram(compileVertexShader(vertexCode), compileFragmentShader(fragmentCode));
-        validateProgram(programId);
-        return programId;
+        return validateProgram(programId);
     }
 
 
-    public static int compileFragmentShader(String string2) {
-        return ShaderUtil.compileShader(35632, string2);
+    public static int compileFragmentShader(String shader) {
+        return ShaderUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, shader);
+    }
+    public static int compileVertexShader(String shader) {
+        return ShaderUtil.compileShader(GLES20.GL_VERTEX_SHADER, shader);
     }
 
-    private static int compileShader(int n, String shader) {
-        int glCreateShader = GLES20.glCreateShader(n);
+    private static int compileShader(int shaderType, String shader) {
+        int glCreateShader = GLES20.glCreateShader(shaderType);
         if (glCreateShader == 0) {
             L.e("Could not create new shader");
             return 0;
         }
         GLES20.glShaderSource(glCreateShader, shader);
         GLES20.glCompileShader(glCreateShader);
-        int[] iArr = new int[1];
-        GLES20.glGetShaderiv(glCreateShader, 35713, iArr, 0);
-        if (iArr[0] != 0) {
+        int[] responseArray = new int[1];
+        GLES20.glGetShaderiv(glCreateShader, GLES20.GL_COMPILE_STATUS, responseArray, 0);
+        if (responseArray[0] != 0) {
             return glCreateShader;
         }
         String glGetShaderInfoLog = GLES20.glGetShaderInfoLog(glCreateShader);
         L.e("shader failed to compile: " + glGetShaderInfoLog, true);
         GLES20.glDeleteShader(glCreateShader);
         return 0;
-
     }
 
-    public static int compileVertexShader(String string2) {
-        return ShaderUtil.compileShader(35633, string2);
-    }
 
-    public static int linkProgram(int i, int i2) {
+
+    public static int linkProgram(int vertexShaderId, int fragmentShaderId) {
         int glCreateProgram = GLES20.glCreateProgram();
         if (glCreateProgram == 0) {
             L.e("Could not create new program");
             return 0;
         }
-        GLES20.glAttachShader(glCreateProgram, i);
-        GLES20.glAttachShader(glCreateProgram, i2);
+        GLES20.glAttachShader(glCreateProgram, vertexShaderId);
+        GLES20.glAttachShader(glCreateProgram, fragmentShaderId);
         GLES20.glLinkProgram(glCreateProgram);
-        int[] iArr = new int[1];
-        GLES20.glGetProgramiv(glCreateProgram, 35714, iArr, 0);
-        if (iArr[0] != 0) {
+        int[] responseArray = new int[1];
+        GLES20.glGetProgramiv(glCreateProgram, GLES20.GL_LINK_STATUS, responseArray, 0);
+        if (responseArray[0] != 0) {
             return glCreateProgram;
         }
         L.e("program failed: " + GLES20.glGetProgramInfoLog(glCreateProgram));
@@ -63,26 +62,23 @@ public class ShaderUtil {
     }
 
 
-
-    public static int makeProgram(Context context, int n, int n2) {
-        return ShaderUtil.buildProgram(TextResourceReader.readTextFileFromResource(context, n), TextResourceReader.readTextFileFromResource(context, n2));
+    public static int makeProgram(Context context, int vertexShaderResId, int fragmentShaderResId) {
+        return ShaderUtil.buildProgram(
+                TextResourceReader.readTextFileFromResource(context, vertexShaderResId),
+                TextResourceReader.readTextFileFromResource(context, fragmentShaderResId)
+        );
     }
 
-    public static boolean validateProgram(int n) {
-        GLES20.glValidateProgram(n);
-        boolean bl = true;
-        int[] nArray = new int[1];
-        GLES20.glGetProgramiv(n, 35715, nArray, 0);
-        if (nArray[0] == 0) {
-            bl = false;
+    public static int validateProgram(int programId) {
+        GLES20.glValidateProgram(programId);
+        int[] responseArray = new int[1];
+        GLES20.glGetProgramiv(programId, GLES20.GL_VALIDATE_STATUS, responseArray, 0);
+        if (responseArray[0] == 0) {
+            L.e("did not validate: " + responseArray[0] + " - " + GLES20.glGetProgramInfoLog(programId));
+            return 0;
         }
-        if (!bl) {
-            L.e("did not validate: " + nArray[0] + " - " + GLES20.glGetProgramInfoLog(n));
-        } else {
-            L.v("is valid");
-        }
-
-        return bl;
+        L.v("is valid");
+        return programId;
     }
 }
 

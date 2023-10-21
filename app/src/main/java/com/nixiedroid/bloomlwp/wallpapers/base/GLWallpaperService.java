@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.base;
 
 import android.content.Context;
@@ -15,8 +12,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 public abstract class GLWallpaperService extends WallpaperService {
     protected abstract int defaultGlSurfaceViewRenderMode();
 
-    public class GLEngine
-    extends WallpaperService.Engine {
+    public class GLEngine extends WallpaperService.Engine {
         protected WallpaperGLSurfaceView glSurfaceView;
         protected boolean isRendererSet;
 
@@ -32,7 +28,7 @@ public abstract class GLWallpaperService extends WallpaperService {
         public void onCreate(SurfaceHolder surfaceHolder) {
             super.onCreate(surfaceHolder);
             glSurfaceView = new WallpaperGLSurfaceView(GLWallpaperService.this);
-            glSurfaceView.setEGLContextFactory(new LowPrioContextFactory());
+            glSurfaceView.setEGLContextFactory(new LowPriorityContextFactory());
         }
 
         @Override
@@ -42,8 +38,8 @@ public abstract class GLWallpaperService extends WallpaperService {
             glSurfaceView = null;
         }
         @SuppressWarnings("SameParameterValue")
-        protected void setEGLContextClientVersion(int versoion) {
-            glSurfaceView.setEGLContextClientVersion(versoion);
+        protected void setEGLContextClientVersion(int version) {
+            glSurfaceView.setEGLContextClientVersion(version);
         }
 
         @SuppressWarnings("SameParameterValue")
@@ -57,8 +53,8 @@ public abstract class GLWallpaperService extends WallpaperService {
             isRendererSet = true;
         }
 
-        class LowPrioContextFactory implements GLSurfaceView.EGLContextFactory {
-            LowPrioContextFactory() {
+        class LowPriorityContextFactory implements GLSurfaceView.EGLContextFactory {
+            LowPriorityContextFactory() {
             }
 
             @Override

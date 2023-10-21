@@ -7,6 +7,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
 
+@SuppressWarnings({"SpellCheckingInspection", "unused"})
 public class Terps {
     private static final AccelerateInterpolator accelerate05;
     private static final AccelerateInterpolator accelerate1;

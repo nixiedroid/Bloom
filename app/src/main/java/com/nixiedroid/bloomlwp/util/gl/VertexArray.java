@@ -8,21 +8,24 @@ import java.nio.FloatBuffer;
 public class VertexArray {
     private final FloatBuffer floatBuffer;
 
-    public VertexArray(float[] fArray) {
-        this.floatBuffer = ByteBuffer.allocateDirect(fArray.length * 4).order(ByteOrder.nativeOrder()).asFloatBuffer();
-        this.floatBuffer.put(fArray);
+    public VertexArray(float[] verticesArray) {
+        this.floatBuffer = ByteBuffer
+                .allocateDirect(verticesArray.length * 4)
+                .order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        this.floatBuffer.put(verticesArray);
     }
 
-    public void setVertexAttribPointer(int n, int n2, int n3, int n4) {
-        this.floatBuffer.position(n);
-        GLES20.glVertexAttribPointer(n2, n3, 5126, false, n4, this.floatBuffer);
-        GLES20.glEnableVertexAttribArray(n2);
+    public void setVertexAttribPointer(int position, int pointerIndex, int size, int stride) {
+        this.floatBuffer.position(position);
+        GLES20.glVertexAttribPointer(pointerIndex, size, GLES20.GL_FLOAT, false, stride, this.floatBuffer);
+        GLES20.glEnableVertexAttribArray(pointerIndex);
         this.floatBuffer.position(0);
     }
 
-    public void updateBuffer(float[] fArray, int n, int n2) {
-        this.floatBuffer.position(n);
-        this.floatBuffer.put(fArray, n, n2);
+    public void updateBuffer(float[] fArray, int position, int value) {
+        this.floatBuffer.position(position);
+        this.floatBuffer.put(fArray, position, value);
         this.floatBuffer.position(0);
     }
 }

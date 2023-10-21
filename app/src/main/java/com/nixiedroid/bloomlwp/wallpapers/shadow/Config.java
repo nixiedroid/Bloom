@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.shadow;
 
 import android.app.WallpaperColors;
@@ -17,13 +14,13 @@ public class Config {
     public final float[] surfaceColorRgb;
     public WallpaperColors wallpaperColors;
 
-    public Config(String[] stringArray, String string2) {
-        this.mainColors = new int[stringArray.length];
-        for (int i = 0; i < stringArray.length; ++i) {
-            int n = stringArray.length;
-            this.mainColors[i] = Color.parseColor(stringArray[n - i - 1]);
+    public Config(String[] colorArray, String colorString) {
+        this.mainColors = new int[colorArray.length];
+        int n = colorArray.length;
+        for (int i = 0; i < colorArray.length; ++i) {
+            this.mainColors[i] = Color.parseColor(colorArray[n - i - 1]);
         }
-        this.surfaceColor = Color.parseColor(string2);
+        this.surfaceColor = Color.parseColor(colorString);
         this.surfaceColorRgb = ColUtil.intToRgb(this.surfaceColor);
     }
 }

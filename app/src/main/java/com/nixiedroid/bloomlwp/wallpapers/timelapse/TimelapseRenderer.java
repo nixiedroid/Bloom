@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.timelapse;
 
 import android.app.WallpaperColors;
@@ -53,7 +50,7 @@ extends UtRenderer {
     private AnimFloat unlockTopFadeInAnim;
     private AnimFloat unlockTopFadeoutAnim;
     private AnimFloat unlockTopSlideAnim;
-    private BroadcastReceiver weatherBroadcastReceiver = new BroadcastReceiver(){
+    private final BroadcastReceiver weatherBroadcastReceiver = new BroadcastReceiver(){
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -186,20 +183,18 @@ extends UtRenderer {
 
     @Override
     protected void doDraw() {
-        int n;
-        int n2;
+        int width;
+        int height;
         if (this.unlockTopSlideAnimValue() < 1.0f) {
-            n2 = this.viewportHeight;
-            n = 0;
+            height = this.viewportHeight;
+            width = 0;
         } else {
-            n2 = this.viewportHeight;
-            n = (int)((float)n2 * 0.2f);
-            n2 = (int)((float)n2 * 0.55f);
+            width = (int)((float)this.viewportHeight * 0.2f);
+            height = (int)((float)this.viewportHeight * 0.55f);
         }
-        int n3 = this.viewportHeight;
         GLES20.glClearColor(this.gradient().middle[0], this.gradient().middle[1], this.gradient().middle[2], 1.0f);
         GLES20.glEnable(3089);
-        GLES20.glScissor(0, n3 - n2, this.viewportWidth, n2 - n);
+        GLES20.glScissor(0, this.viewportHeight - height, this.viewportWidth, height - width);
         GLES20.glClear(16384);
         GLES20.glDisable(3089);
         GLES20.glDisable(3024);
@@ -218,16 +213,15 @@ extends UtRenderer {
 
     @Override
     public int frameInterval() {
-        TimelapseProgram timelapseProgram = this.program;
-        int n = 2;
-        if (timelapseProgram != null && !this.unlockTopSlideAnim.isRunning() && !this.unlockTopFadeoutAnim.isRunning()) {
+        int interval = 2;
+        if (this.program != null && !this.unlockTopSlideAnim.isRunning() && !this.unlockTopFadeoutAnim.isRunning()) {
             if (!this.isPreview && !(this.weatherTransitionPercent < 1.0f)) {
-                n = 10;
+                interval = 10;
             }
         } else {
-            n = 1;
+            interval = 1;
         }
-        return n;
+        return interval;
     }
 
     public Gradient gradient() {

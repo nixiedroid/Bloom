@@ -17,7 +17,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class OrbitRenderer
         extends UtRenderer {
     private final float[] matrix;
-    private float dayPercentOffset;
+    private final float dayPercentOffset;
     private PointF downPoint;
     private long downTime;
     private PointF dragPoint;
@@ -139,8 +139,7 @@ public class OrbitRenderer
     @Override
     protected void doUpdate() {
         float f = TimeUtil.nowDayPercent();
-        float f2 = this.dayPercentOffset;
-        this.time.setDayPercent(f - f2);
+        this.time.setDayPercent(f - this.dayPercentOffset);
         this.updatePhase();
         this.updateOffset();
     }
@@ -217,44 +216,34 @@ public class OrbitRenderer
 
     @Override
     protected void onTouchEvent(MotionEvent motionEvent) {
-        block3:
-        {
-            block4:
-            {
-                block5:
-                {
-                    Object object;
-                    block6:
-                    {
-                        object = this.phase;
-                        if (object == Phase.LOCK_ANIMIN || object == Phase.LOCKED_RESTING || object == Phase.POST_LOCK)
-                            break block3;
-                        int n = motionEvent.getAction();
-                        if (n == 0) break block4;
-                        if (n == 1) break block5;
-                        if (n == 2) break block6;
-                        if (n == 3) break block5;
-                        break block3;
+        if (this.phase != Phase.LOCK_ANIMIN && this.phase != Phase.LOCKED_RESTING && this.phase != Phase.POST_LOCK) {
+            switch (motionEvent.getAction()) {
+                case 0:
+                    this.phase = Phase.DRAGGING;
+                    this.downTime = System.currentTimeMillis();
+                    this.downPoint = new PointF(motionEvent.getX(), motionEvent.getY());
+                    this.dragPoint = new PointF(motionEvent.getX(), motionEvent.getY());
+                    this.offsetRatio = 0.0f;
+                    this.isFlingingUntil = 0L;
+                    return;
+                case 1:
+
+                case 3:
+                    if (this.phase != Phase.FLINGING) {
+                        this.phase = Phase.POST_DRAG;
+                        return;
                     }
-                    object = this.dragPoint;
-                    if (object == null) {
+                    return;
+                case 2:
+                    if (dragPoint == null) {
                         this.dragPoint = new PointF(motionEvent.getX(), motionEvent.getY());
                     } else {
-                        ((PointF) object).set(motionEvent.getX(), motionEvent.getY());
+                        dragPoint.set(motionEvent.getX(), motionEvent.getY());
                     }
-                    break block3;
-                }
-                if (this.phase != Phase.FLINGING) {
-                    this.phase = Phase.POST_DRAG;
-                }
-                break block3;
+                    break;
+                default:
+
             }
-            this.phase = Phase.DRAGGING;
-            this.downTime = System.currentTimeMillis();
-            this.downPoint = new PointF(motionEvent.getX(), motionEvent.getY());
-            this.dragPoint = new PointF(motionEvent.getX(), motionEvent.getY());
-            this.offsetRatio = 0.0f;
-            this.isFlingingUntil = 0L;
         }
     }
 
@@ -282,7 +271,7 @@ public class OrbitRenderer
         return this.time;
     }
 
-    public static enum Phase {
+    public enum Phase {
         RESTING,
         DRAGGING,
         POST_DRAG,
@@ -290,7 +279,7 @@ public class OrbitRenderer
         POST_FLING,
         LOCK_ANIMIN,
         LOCKED_RESTING,
-        POST_LOCK;
+        POST_LOCK
 
     }
 }

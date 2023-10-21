@@ -17,12 +17,12 @@ public class Gradient {
         this.lower2 = new float[3];
     }
 
-    public Gradient(String string2, String string3, String string4, String string5, String string6) {
-        this.upper1 = ColUtil.stringToRgb(string2);
-        this.upper2 = ColUtil.stringToRgb(string3);
-        this.middle = ColUtil.stringToRgb(string4);
-        this.lower1 = ColUtil.stringToRgb(string5);
-        this.lower2 = ColUtil.stringToRgb(string6);
+    public Gradient(String upper1, String upper2, String middle, String lower1, String lower2) {
+        this.upper1 = ColUtil.stringToRgb(upper1);
+        this.upper2 = ColUtil.stringToRgb(upper2);
+        this.middle = ColUtil.stringToRgb(middle);
+        this.lower1 = ColUtil.stringToRgb(lower1);
+        this.lower2 = ColUtil.stringToRgb(lower2);
     }
 
     public static void copyFromTo(final Gradient gradient, final Gradient gradient2) {

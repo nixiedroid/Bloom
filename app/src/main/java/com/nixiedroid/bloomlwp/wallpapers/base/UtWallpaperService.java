@@ -68,7 +68,9 @@ extends GLWallpaperService {
         private final float[] tempGrav = new float[3];
 
         public UtEngine() {
-            this.displayRotation = ((DisplayManager)App.get().getSystemService(Context.DISPLAY_SERVICE)).getDisplay(0).getRotation();
+            this.displayRotation = (
+                    (DisplayManager)App.get().getSystemService(Context.DISPLAY_SERVICE)
+            ).getDisplay(0).getRotation();
         }
 
         private void registerReceivers() {
@@ -80,47 +82,45 @@ extends GLWallpaperService {
 
         private void registerSensors() {
             if (UtWallpaperService.this.handlesGravity()) {
-                this.sensorManager.registerListener(this.gravitySensorListener, this.gravitySensor, 2);
+                this.sensorManager.registerListener(gravitySensorListener, gravitySensor, 2);
             }
         }
 
         private void unregisterReceivers() {
             try {
-                UtWallpaperService.this.unregisterReceiver(this.deviceEventsReceiver);
+                unregisterReceiver(deviceEventsReceiver);
             }
             catch (Exception ignored) {
             }
         }
 
         private void unregisterSensors() {
-            if (UtWallpaperService.this.handlesGravity()) {
-                this.sensorManager.unregisterListener(this.gravitySensorListener);
+            if (handlesGravity()) {
+                sensorManager.unregisterListener(gravitySensorListener);
             }
         }
 
 
         protected void initGravitySensor() {
             if (this.sensorManager.getDefaultSensor(1) != null) {
-                for (Sensor sensor : this.sensorManager.getSensorList(1)) {
+                for (Sensor sensor : sensorManager.getSensorList(1)) {
                     L.v("accelerometer sensor - vendor: " + sensor.getVendor() + " version: " + sensor.getVersion() + " power: " + sensor.getPower());
                 }
             }
             if (this.sensorManager.getDefaultSensor(9) != null) {
-                for (Sensor sensor2 : this.sensorManager.getSensorList(9)) {
+                for (Sensor sensor2 : sensorManager.getSensorList(9)) {
                     L.v("gravity sensor - vendor: " + sensor2.getVendor() + " version: " + sensor2.getVersion() + " power: " + sensor2.getPower());
                 }
             }
-            this.gravitySensorType = this.sensorManager.getDefaultSensor(9) != null ? 9 : 1;
-            L.v("sensor type: " +
-                    (this.gravitySensorType == 9 ? "gravity" : "accelerometer"));
-            this.gravitySensor = this.sensorManager.getDefaultSensor(this.gravitySensorType);
-            this.gravitySensorListener = new GravitySensorListener();
-
+            this.gravitySensorType = sensorManager.getDefaultSensor(9) != null ? 9 : 1;
+            L.v("sensor type: " + (gravitySensorType == 9 ? "gravity" : "accelerometer"));
+            gravitySensor = sensorManager.getDefaultSensor(gravitySensorType);
+            gravitySensorListener = new GravitySensorListener();
         }
 
         @Override
         public WallpaperColors onComputeColors() {
-            UtRenderer utRenderer = this.renderer;
+            UtRenderer utRenderer = renderer;
             if (utRenderer == null) {
                 return null;
             }
@@ -133,20 +133,20 @@ extends GLWallpaperService {
             if (GlUtil.supportsEs2(App.get())) {
                 this.setEGLContextClientVersion(2);
                 this.setPreserveEGLContextOnPause(true);
-                this.setTouchEventsEnabled(UtWallpaperService.this.handlesTouchesAndGestures());
-                this.setOffsetNotificationsEnabled(UtWallpaperService.this.handlesTouchesAndGestures());
-                this.renderer = UtWallpaperService.this.makeRenderer();
+                this.setTouchEventsEnabled(handlesTouchesAndGestures());
+                this.setOffsetNotificationsEnabled(handlesTouchesAndGestures());
+                this.renderer = makeRenderer();
                 this.renderer.setEngine(this);
                 this.renderer.setIsPreview(this.isPreview());
                 this.setRenderer(this.renderer);
-                UtWallpaperService.this.onWallpaperAttached(this.renderer);
+                onWallpaperAttached(this.renderer);
                 this.registerReceivers();
-                this.sensorManager = (SensorManager)UtWallpaperService.this.getSystemService(Context.SENSOR_SERVICE);
-                if (UtWallpaperService.this.handlesGravity()) {
+                this.sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+                if (handlesGravity()) {
                     this.initGravitySensor();
                 }
-                this.keyMan = (KeyguardManager)UtWallpaperService.this.getSystemService(Context.KEYGUARD_SERVICE);
-                if (UtWallpaperService.this.handlesTouchesAndGestures()) {
+                this.keyMan = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+                if (handlesTouchesAndGestures()) {
                     this.gestureDetector = new GestureDetectorCompat(UtWallpaperService.this, new GestureListener());
                 }
                 return;
@@ -158,7 +158,7 @@ extends GLWallpaperService {
         public void onDestroy() {
             super.onDestroy();
             this.unregisterReceivers();
-            if (UtWallpaperService.this.handlesGravity()) {
+            if (handlesGravity()) {
                 this.sensorManager.unregisterListener(this.gravitySensorListener);
             }
             this.renderer.onDestroy();
@@ -172,31 +172,31 @@ extends GLWallpaperService {
 
         @Override
         public void onSurfaceRedrawNeeded(SurfaceHolder surfaceHolder) {
-            this.renderer.onSurfaceRedrawNeeded();
+            renderer.onSurfaceRedrawNeeded();
         }
 
         @Override
         public void onTouchEvent(MotionEvent motionEvent) {
-            if (UtWallpaperService.this.handlesTouchesAndGestures() && this.renderer != null) {
-                this.gestureDetector.onTouchEvent(motionEvent);
-                this.renderer.onTouchEvent(motionEvent);
+            if (handlesTouchesAndGestures() && renderer != null) {
+                gestureDetector.onTouchEvent(motionEvent);
+                renderer.onTouchEvent(motionEvent);
             }
         }
 
         @Override
-        public void onVisibilityChanged(boolean bl) {
-            L.d(String.valueOf(bl));
-            if (bl) {
+        public void onVisibilityChanged(boolean isVisible) {
+            L.d(String.valueOf(isVisible));
+            if (isVisible) {
                 this.registerSensors();
-                if (this.keyMan.isKeyguardLocked()) {
+                if (keyMan.isKeyguardLocked()) {
                     L.d("and is on lockscreen");
-                    this.renderer.onVisibleAtLockScreen();
+                    renderer.onVisibleAtLockScreen();
                 } else {
-                    this.renderer.onVisible();
+                    renderer.onVisible();
                 }
             } else {
-                this.unregisterSensors();
-                this.renderer.onNotVisible();
+                unregisterSensors();
+                renderer.onNotVisible();
             }
         }
 
@@ -204,41 +204,29 @@ extends GLWallpaperService {
         extends BroadcastReceiver {
             @Override
             public void onReceive(Context object, Intent intent) {
-                if (UtEngine.this.renderer == null) {
+                if (renderer == null) {
                     return;
                 }
-                String action = intent.getAction();
-                char c = 65535;
-                int hashCode = action.hashCode();
-
-                if (hashCode != -2128145023) {
-                    if (hashCode != -1454123155) {
-                        if (hashCode == 823795052 && action.equals("android.intent.action.USER_PRESENT")) {
-                            c = 2;
+                switch (intent.getAction()){
+                    case "android.intent.action.SCREEN_OFF":
+                        L.d("screen-off");
+                        if (handlesGravity()) {
+                            renderer.onScreenOff();
+                            sensorManager.unregisterListener((SensorEventListener) this);
+                            break;
                         }
-                    } else if (action.equals("android.intent.action.SCREEN_ON")) {
-                        c = 1;
-                    }
-                } else if (action.equals("android.intent.action.SCREEN_OFF")) {
-                    c = 0;
-                }
-
-                if (c == 0) {
-                    L.d("screen-off");
-                    if (handlesGravity()) {
                         renderer.onScreenOff();
-                        sensorManager.unregisterListener((SensorEventListener) this);
-                    }
-                    renderer.onScreenOff();
-                } else if (c == 1) {
-                    L.d("screen-on");
-                    renderer.onScreenOn();
-                } else if (c == 2) {
-                    TimeUtil.setUnlockTime();
-                    L.d("user_present");
-                    renderer.onUserPresent();
+                        break;
+                    case "android.intent.action.SCREEN_ON":
+                        L.d("screen-on");
+                        renderer.onScreenOn();
+                        break;
+                    case "android.intent.action.USER_PRESENT":
+                        TimeUtil.setUnlockTime();
+                        L.d("user_present");
+                        renderer.onUserPresent();
+                        break;
                 }
-
             }
         }
 
@@ -246,7 +234,7 @@ extends GLWallpaperService {
         extends GestureDetector.SimpleOnGestureListener {
             @Override
             public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
-                UtEngine.this.renderer.onFling(motionEvent, motionEvent2, f, f);
+                renderer.onFling(motionEvent, motionEvent2, f, f);
                 return true;
             }
         }
@@ -258,14 +246,14 @@ extends GLWallpaperService {
             }
 
             @Override
-            public void onSensorChanged(SensorEvent object) {
-                if (object.sensor.getType() == UtEngine.this.gravitySensorType) {
-                    Util.adjustGravityVectorForDisplayRotation(UtEngine.this.displayRotation, object.values, UtEngine.this.tempGrav);
-                    float[] grav = UtEngine.this.tempGrav;
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                if (sensorEvent.sensor.getType() == gravitySensorType) {
+                    Util.adjustGravityVectorForDisplayRotation(displayRotation, sensorEvent.values, tempGrav);
+                    float[] grav = tempGrav;
                     grav[0] = grav[0] / 9.81f;
                     grav[1] = grav[1] / 9.81f;
                     grav[2] = grav[2] / 9.81f;
-                    UtEngine.this.renderer.onGravitySensor(UtEngine.this.tempGrav[0], UtEngine.this.tempGrav[1], UtEngine.this.tempGrav[2]);
+                    renderer.onGravitySensor(tempGrav[0], tempGrav[1], tempGrav[2]);
                 }
             }
         }

@@ -7,13 +7,13 @@ import java.util.Objects;
 public class Quad {
     protected float[] basePositions = new float[18];
     protected float[][] cornerRgbs;
+    protected float[] upperLeftRgb;
+    protected float[] upperRightRgb;
     protected float[] lowerLeftRgb;
     protected float[] lowerRightRgb;
     protected float[] matrix;
-    float[] textureCoords;
     protected float[] transformedPositions = new float[18];
-    protected float[] upperLeftRgb;
-    protected float[] upperRightRgb;
+    float[] textureCoords;
 
     public Quad(float f, float f2, Origin origin) {
         this.matrix = new float[16];
@@ -22,74 +22,58 @@ public class Quad {
         this.lowerLeftRgb = new float[4];
         this.lowerRightRgb = new float[4];
         this.cornerRgbs = new float[][]{this.upperLeftRgb, this.upperRightRgb, this.lowerLeftRgb, this.lowerRightRgb};
-        this.textureCoords = new float[]{0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f};
+        this.textureCoords = new float[]{
+                0.0f, 0.0f, 1.0f,
+                0.0f, 1.0f, 1.0f,
+                0.0f, 0.0f, 1.0f,
+                1.0f, 0.0f, 1.0f};
         Matrix.setIdentityM(this.matrix, 0);
         this.setBasePositions(f, f2, origin);
         this.setColors(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public void applyMatrix() {
-        float[] fArray = new float[4];
-        fArray[3] = 1.0f;
-        float[] fArray2 = new float[4];
-        fArray2[3] = 1.0f;
+        float[] fArray = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+        float[] result = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
         for (int i = 0; i < this.transformedPositions.length; i += 3) {
-            float[] fArray3 = this.basePositions;
-            fArray[0] = fArray3[i];
-            int n = i + 1;
-            fArray[1] = fArray3[n];
-            int n2 = i + 2;
-            fArray[2] = fArray3[n2];
-            Matrix.multiplyMV(fArray2, 0, this.matrix, 0, fArray, 0);
-            fArray3 = this.transformedPositions;
-            fArray3[i] = fArray2[0];
-            fArray3[n] = fArray2[1];
-            fArray3[n2] = fArray2[2];
+            fArray[0] = this.basePositions[i];
+            fArray[1] = this.basePositions[i + 1];
+            fArray[2] = this.basePositions[i + 2];
+            Matrix.multiplyMV(result, 0, this.matrix, 0, fArray, 0);
+            this.transformedPositions[i] = result[0];
+            this.transformedPositions[i + 1] = result[1];
+            this.transformedPositions[i + 2] = result[2];
         }
     }
 
-    public void setBasePositions(float f, float f2, float f3, float f4) {
-        float[] fArray = this.basePositions;
-        fArray[0] = f;
-        fArray[1] = f2;
-        fArray[2] = 0.0f;
-        fArray[3] = f3;
-        fArray[4] = f2;
-        fArray[5] = 0.0f;
-        fArray[6] = f3;
-        fArray[7] = f4;
-        fArray[8] = 0.0f;
-        fArray[9] = f;
-        fArray[10] = f2;
-        fArray[11] = 0.0f;
-        fArray[12] = f3;
-        fArray[13] = f4;
-        fArray[14] = 0.0f;
-        fArray[15] = f;
-        fArray[16] = f4;
-        fArray[17] = 0.0f;
+    public void setBasePositions(float x, float y, float z, float d) {
+        basePositions[0] = x;
+        basePositions[1] = y;
+        basePositions[2] = 0.0f;
+        basePositions[3] = z;
+        basePositions[4] = y;
+        basePositions[5] = 0.0f;
+        basePositions[6] = z;
+        basePositions[7] = d;
+        basePositions[8] = 0.0f;
+        basePositions[9] = x;
+        basePositions[10] = y;
+        basePositions[11] = 0.0f;
+        basePositions[12] = z;
+        basePositions[13] = d;
+        basePositions[14] = 0.0f;
+        basePositions[15] = x;
+        basePositions[16] = d;
+        basePositions[17] = 0.0f;
         this.applyMatrix();
     }
 
     public void setBasePositions(float f, float f2, Origin origin) {
-        float f3;
-        float f4;
-        //Switch these down if fails
         if (Objects.requireNonNull(origin) == Origin.CENTER) {
-            float f5 = -f / 2.0f;
-            f4 = -f2 / 2.0f;
-            f3 = f2 / 2.0f;
-            f2 = f /= 2.0f;
-            f = f5;
-        } else {
-            f3 = -f / 2.0f;
-            f4 = -f2;
-            f2 = f / 2.0f;
-            float f6 = 0.0f;
-            f = f3;
-            f3 = f6;
+            setBasePositions(-f / 2.0f, -f2 / 2.0f, f / 2.0f, f2 / 2.0f);
+            return;
         }
-        this.setBasePositions(f, f4, f2, f3);
+        setBasePositions(-f / 2.0f, -f2, f / 2.0f, 0.0f);
     }
 
     public void setColors(float f, float f2, float f3, float f4) {
@@ -101,24 +85,22 @@ public class Quad {
         }
     }
 
-    public void setLowerLeftRgb(float f, float f2, float f3, float f4) {
-        float[] fArray = this.lowerLeftRgb;
-        fArray[0] = f;
-        fArray[1] = f2;
-        fArray[2] = f3;
-        fArray[3] = f4;
+    public void setLowerLeftRgb(float x, float y, float z, float d) {
+        lowerLeftRgb[0] = x;
+        lowerLeftRgb[1] = y;
+        lowerLeftRgb[2] = z;
+        lowerLeftRgb[3] = d;
     }
 
     public void setLowerLeftRgb(float[] fArray, float f) {
         this.setLowerLeftRgb(fArray[0], fArray[1], fArray[2], f);
     }
 
-    public void setLowerRightRgb(float f, float f2, float f3, float f4) {
-        float[] fArray = this.lowerRightRgb;
-        fArray[0] = f;
-        fArray[1] = f2;
-        fArray[2] = f3;
-        this.upperRightRgb[3] = f4;
+    public void setLowerRightRgb(float x, float y, float z, float d) {
+        lowerRightRgb[0] = x;
+        lowerRightRgb[1] = y;
+        lowerRightRgb[2] = z;
+        upperRightRgb[3] = d;
     }
 
     public void setLowerRightRgb(float[] fArray, float f) {
@@ -126,11 +108,10 @@ public class Quad {
     }
 
     public void setUpperLeftRgb(float f, float f2, float f3, float f4) {
-        float[] fArray = this.upperLeftRgb;
-        fArray[0] = f;
-        fArray[1] = f2;
-        fArray[2] = f3;
-        fArray[3] = f4;
+        upperLeftRgb[0] = f;
+        upperLeftRgb[1] = f2;
+        upperLeftRgb[2] = f3;
+        upperLeftRgb[3] = f4;
     }
 
     public void setUpperLeftRgb(float[] fArray, float f) {
@@ -138,11 +119,10 @@ public class Quad {
     }
 
     public void setUpperRightRgb(float f, float f2, float f3, float f4) {
-        float[] fArray = this.upperRightRgb;
-        fArray[0] = f;
-        fArray[1] = f2;
-        fArray[2] = f3;
-        fArray[3] = f4;
+        upperRightRgb[0] = f;
+        upperRightRgb[1] = f2;
+        upperRightRgb[2] = f3;
+        upperRightRgb[3] = f4;
     }
 
     public void setUpperRightRgb(float[] fArray, float f) {
@@ -150,39 +130,40 @@ public class Quad {
     }
 
     public void writeColors(float[] fArray, int n) {
-        float[] fArray2 = this.upperLeftRgb;
-        fArray[n] = fArray2[0];
-        fArray[n + 1] = fArray2[1];
-        fArray[n + 2] = fArray2[2];
-        fArray[n + 3] = fArray2[3];
-        float[] fArray3 = this.upperRightRgb;
-        fArray[n + 4] = fArray3[0];
-        fArray[n + 5] = fArray3[1];
-        fArray[n + 6] = fArray3[2];
-        fArray[n + 7] = fArray3[3];
-        fArray3 = this.lowerRightRgb;
-        fArray[n + 8] = fArray3[0];
-        fArray[n + 9] = fArray3[1];
-        fArray[n + 10] = fArray3[2];
-        fArray[n + 11] = fArray3[3];
-        fArray[n + 12] = fArray2[0];
-        fArray[n + 13] = fArray2[1];
-        fArray[n + 14] = fArray2[2];
-        fArray[n + 15] = fArray2[3];
-        fArray[n + 16] = fArray3[0];
-        fArray[n + 17] = fArray3[1];
-        fArray[n + 18] = fArray3[2];
-        fArray[n + 19] = fArray3[3];
-        fArray2 = this.lowerLeftRgb;
-        fArray[n + 20] = fArray2[0];
-        fArray[n + 21] = fArray2[1];
-        fArray[n + 22] = fArray2[2];
-        fArray[n + 23] = fArray2[3];
+        fArray[n] = upperLeftRgb[0];
+        fArray[n + 1] = upperLeftRgb[1];
+        fArray[n + 2] = upperLeftRgb[2];
+        fArray[n + 3] = upperLeftRgb[3];
+
+        fArray[n + 4] = upperRightRgb[0];
+        fArray[n + 5] = upperRightRgb[1];
+        fArray[n + 6] = upperRightRgb[2];
+        fArray[n + 7] = upperRightRgb[3];
+
+        fArray[n + 8] = lowerRightRgb[0];
+        fArray[n + 9] = lowerRightRgb[1];
+        fArray[n + 10] = lowerRightRgb[2];
+        fArray[n + 11] = lowerRightRgb[3];
+
+        fArray[n + 12] = upperLeftRgb[0];
+        fArray[n + 13] = upperLeftRgb[1];
+        fArray[n + 14] = upperLeftRgb[2];
+        fArray[n + 15] = upperLeftRgb[3];
+
+        fArray[n + 16] = lowerRightRgb[0];
+        fArray[n + 17] = lowerRightRgb[1];
+        fArray[n + 18] = lowerRightRgb[2];
+        fArray[n + 19] = lowerRightRgb[3];
+
+        fArray[n + 20] = lowerLeftRgb[0];
+        fArray[n + 21] = lowerLeftRgb[1];
+        fArray[n + 22] = lowerLeftRgb[2];
+        fArray[n + 23] = lowerLeftRgb[3];
     }
 
     public enum Origin {
         CENTER,
-        BOTTOM_CENTER;
+        BOTTOM_CENTER
 
     }
 }

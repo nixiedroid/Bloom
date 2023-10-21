@@ -3,37 +3,37 @@ package com.nixiedroid.bloomlwp.util;
 import android.graphics.PointF;
 
 public class MathUtil {
-    public static float clamp(float f) {
-        return MathUtil.clamp(f, 0.0f, 1.0f);
+    public static float clamp(float value) {
+        return MathUtil.clamp(value, 0.0f, 1.0f);
     }
 
-    public static float clamp(float f, float boundaryOne, float boundaryTwo) {
-        float low = boundaryOne;
-        float high = boundaryTwo;
-        if (boundaryOne > boundaryTwo) {
-            high = boundaryOne;
-            low = boundaryTwo;
+    public static float clamp(float value, float min, float max) {
+        float low = min;
+        float high = max;
+        if (min > max) {
+            high = min;
+            low = max;
         }
-        if (f < low) {
+        if (value < low) {
             return low;
         }
-        return Math.min(f, high);
+        return Math.min(value, high);
     }
 
-    public static float getAngle(float f, float f2) {
-        return (float)Math.atan2(f2, f);
+    public static float getAngle(float x, float y) {
+        return (float)Math.atan2(y, x);
     }
 
-    public static float getLength(float f, float f2) {
-        return (float)Math.sqrt(f * f + f2 * f2);
+    public static float getLength(float x, float y) {
+        return (float)Math.sqrt(x * x + y * y);
     }
 
-    public static boolean isBetween(float f, float f2, float f3) {
-        return f > f2 && f < f3;
+    public static boolean isBetween(float value, float min, float max) {
+        return value > min && value < max;
     }
 
-    public static float lerp(float f, float f2, float f3) {
-        return f2 + (f3 - f2) * f;
+    public static float lerp(float start, float end, float coef) {
+        return end + (coef - end) * start;
     }
 
     public static float map(float f, float f2, float f3, float f4, float f5) {

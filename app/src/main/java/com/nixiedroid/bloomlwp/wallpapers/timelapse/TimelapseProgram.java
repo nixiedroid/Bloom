@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.timelapse;
 
 import android.opengl.GLES20;
@@ -16,7 +13,6 @@ extends ShaderProgram {
     public final int aPositionLocation;
     public final int aTextureCoordinatesLocation;
     private final LowerGradientLayer lowerLayer;
-    private final int lowerTextureId;
     private final float[] matrix = new float[16];
     private final TimelapseRenderer renderer;
     private long startTime;
@@ -27,7 +23,6 @@ extends ShaderProgram {
     public final int uTextureUnitLocation;
     public final int uTime;
     private final UpperGradientLayer upperLayer;
-    private final int upperTextureId;
 
     public TimelapseProgram(TimelapseRenderer timelapseRenderer) {
         super(App.get(), R.raw.timelapse_vertex_shader, R.raw.timelapse_fragment_shader);
@@ -41,13 +36,13 @@ extends ShaderProgram {
         this.aTextureCoordinatesLocation = GLES20.glGetAttribLocation(this.programId, "aTextureCoordinates");
         this.aColorLocation = GLES20.glGetAttribLocation(this.programId, "aColor");
         int n = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_top_gradient_1440 : R.drawable.timelapse_top_gradient_1080;
-        this.upperTextureId = TextureUtil.loadTexture(App.get(), n, false);
+        int upperTextureId = TextureUtil.loadTexture(App.get(), n, false);
         n = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_bottom_gradient_1440 : R.drawable.timelapse_bottom_gradient_1080;
-        this.lowerTextureId = TextureUtil.loadTexture(App.get(), n, false);
-        this.transitionUpperLayer = new UpperGradientLayer(this.renderer, this, this.upperTextureId, true);
-        this.upperLayer = new UpperGradientLayer(this.renderer, this, this.upperTextureId, false);
-        this.transitionLowerLayer = new LowerGradientLayer(this.renderer, this, this.lowerTextureId, true);
-        this.lowerLayer = new LowerGradientLayer(this.renderer, this, this.lowerTextureId, false);
+        int lowerTextureId = TextureUtil.loadTexture(App.get(), n, false);
+        this.transitionUpperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, true);
+        this.upperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, false);
+        this.transitionLowerLayer = new LowerGradientLayer(this.renderer, this, lowerTextureId, true);
+        this.lowerLayer = new LowerGradientLayer(this.renderer, this, lowerTextureId, false);
         this.addChildNode(this.upperLayer);
         this.addChildNode(this.transitionUpperLayer);
         this.addChildNode(this.lowerLayer);
