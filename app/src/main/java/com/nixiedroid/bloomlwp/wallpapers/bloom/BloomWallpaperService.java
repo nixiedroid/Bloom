@@ -1,29 +1,28 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.wallpapers.PermissionsActivity;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtWallpaperService;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
 
-public class TimelapseWallpaperService
+public class BloomWallpaperService
 extends UtWallpaperService {
-    private static TimelapseWallpaperService instance;
+    private static BloomWallpaperService instance;
     private final BroadcastReceiver permissionReceiver = new BroadcastReceiver(){
 
         @Override
         public void onReceive(Context object, Intent intent) {
-            boolean hasPermission = ContextCompat.checkSelfPermission(TimelapseWallpaperService.this, "android.permission.ACCESS_FINE_LOCATION") == 0;
             L.v("got this - has permission? " );
-            if (hasPermission) {
+            if (ContextCompat.checkSelfPermission(BloomWallpaperService.this, "android.permission.ACCESS_FINE_LOCATION") == 0) {
                 weatherMan.start();
                 sunriseUtil.get();
             }
@@ -32,22 +31,19 @@ extends UtWallpaperService {
     private SunriseUtil sunriseUtil;
     private WeatherManager weatherMan;
 
-    public static TimelapseWallpaperService get() {
+    public static BloomWallpaperService get() {
         return instance;
     }
 
-    private void initPermissionsRelated(UtRenderer object) {
-        if (!object.isPreview()) {
-            return;
-        }
-        LocalBroadcastManager.getInstance(
-                App.get()).registerReceiver(this.permissionReceiver, new IntentFilter("permission_result")
-        );
-        boolean bl = ContextCompat.checkSelfPermission(
-                this, "android.permission.ACCESS_FINE_LOCATION") == 0;
-        L.d("has fine location permissions? " + bl);
-        if (!bl) {
-            PermissionsActivity.launchActivity(this, 2);
+    private void initPermissionsRelated(UtRenderer renderer) {
+        if (!renderer.isPreview()) {
+            LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.permissionReceiver, new IntentFilter("permission_result"));
+            boolean hasPermission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION") == 0;
+            L.d("has fine location permissions? " + hasPermission);
+            if (!hasPermission) {
+                Toast.makeText(App.get(),"No location permission granted. \nPlease, grant it in settings", Toast.LENGTH_LONG).show();
+              //  PreferencesActivity.launchActivity(this, 2);
+            }
         }
     }
 
@@ -63,7 +59,7 @@ extends UtWallpaperService {
 
     @Override
     protected UtRenderer makeRenderer() {
-        return new TimelapseRenderer();
+        return new BloomRenderer();
     }
 
     @Override

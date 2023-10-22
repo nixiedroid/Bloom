@@ -10,9 +10,11 @@ import com.nixiedroid.bloomlwp.wallpapers.weather.WeatherVo;
 
 public class WeatherManager extends AbstractWeatherManager {
 
+    String API_KEY;
+
     public WeatherManager(Context context) {
         super(context);
-
+        API_KEY = cachePrefs.getString("API_KEY","0");
     }
 
     @Override

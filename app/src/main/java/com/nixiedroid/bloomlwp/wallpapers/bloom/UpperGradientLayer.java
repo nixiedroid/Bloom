@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
 import android.opengl.GLES20;
 import com.nixiedroid.bloomlwp.util.MathUtil;
@@ -11,16 +11,16 @@ extends Layer {
     private float defaultY;
     private float height;
     private final boolean isTransitionLayer;
-    private final TimelapseProgram program;
+    private final BloomProgram program;
     private final DoubleEasyQuad quad;
-    private final TimelapseRenderer renderer;
+    private final BloomRenderer renderer;
     private final int textureId;
     private float unlockStartY;
     private int viewportHeight;
     private int viewportWidth;
     private float y;
 
-    public UpperGradientLayer(TimelapseRenderer renderer, TimelapseProgram program, int n, boolean bl) {
+    public UpperGradientLayer(BloomRenderer renderer, BloomProgram program, int n, boolean bl) {
         this.renderer = renderer;
         this.program = program;
         this.textureId = n;

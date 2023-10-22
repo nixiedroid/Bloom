@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
 import com.nixiedroid.bloomlwp.util.ColUtil;
 

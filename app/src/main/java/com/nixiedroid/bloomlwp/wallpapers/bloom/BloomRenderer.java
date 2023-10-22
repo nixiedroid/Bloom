@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
 import android.app.WallpaperColors;
 import android.content.BroadcastReceiver;
@@ -19,10 +19,13 @@ import com.nixiedroid.bloomlwp.util.Terps;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.WeatherVo;
+import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class TimelapseRenderer
+public class BloomRenderer
 extends UtRenderer {
     private static final int[] weatherConditionByPriority = new int[]{8, 6, 7, 2, 3, 4, 5, 9, 1, 0};
     private Gradient gradient;
@@ -30,7 +33,7 @@ extends UtRenderer {
     private boolean isOscillationDisabled;
     private Gradient lastGradient;
     private int lastWeatherCondition;
-    private TimelapseProgram program;
+    private BloomProgram program;
     private Gradient scratch1 = new Gradient();
     private Gradient scratch2 = new Gradient();
     private int startSlidingIndex;
@@ -41,7 +44,7 @@ extends UtRenderer {
         public void onReceive(Context object, Intent intent) {
             final boolean booleanExtra = intent.getBooleanExtra("sunrise_result", false);
             L.v("got sunrise broadcast - " +booleanExtra);
-            TimelapseRenderer.this.gradientMan.updateAllRanges();
+            BloomRenderer.this.gradientMan.updateAllRanges();
         }
     };
     private AnimFloat unlockBottomFadeInAnim;
@@ -55,16 +58,16 @@ extends UtRenderer {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra("weather_result", false)) {
-                TimelapseRenderer.this.updateWeatherCondition();
+                BloomRenderer.this.updateWeatherCondition();
             }
         }
     };
     private int weatherCondition;
     private float weatherTransitionPercent;
 
-    public TimelapseRenderer() {
-        if (App.get().timelapseTestSettings != null) {
-            if (App.get().timelapseTestSettings.shouldDisableOscillation) {
+    public BloomRenderer() {
+        if (App.get().bloomTestSettings != null) {
+            if (App.get().bloomTestSettings.shouldDisableOscillation) {
                 this.isOscillationDisabled = true;
             }
         }
@@ -102,7 +105,7 @@ extends UtRenderer {
 
     private void updateGradient() {
         Gradient.copyFromTo(this.gradient, this.lastGradient);
-        long l = TimeUtil.elapsedRealTimeSince(TimelapseWallpaperService.get().weatherMan().resultTime());
+        long l = TimeUtil.elapsedRealTimeSince(BloomWallpaperService.get().weatherMan().resultTime());
         float f = this.weatherTransitionPercent;
         this.weatherTransitionPercent = MathUtil.normalize(l, 0.0f, 3000.0f, true);
         float f2 = TimeUtil.nowDayPercent();
@@ -122,18 +125,18 @@ extends UtRenderer {
     private void updateGradientDebugMode() {
         Gradient.copyFromTo(this.gradient, this.lastGradient);
         this.weatherTransitionPercent = MathUtil.map(System.currentTimeMillis() - this.surfaceChangeTime, 2000.0f, 5000.0f, 0.0f, 1.0f, true);
-        TimelapseTestSettings timelapseTestSettings = App.get().timelapseTestSettings;
-        if (timelapseTestSettings.timeIndex2 <= -1 && timelapseTestSettings.weather2 <= -1) {
-            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(timelapseTestSettings.weather1, timelapseTestSettings.timeIndex1, this.isOscillationDisabled, this.gradient);
+        BloomTestSettings bloomTestSettings = App.get().bloomTestSettings;
+        if (bloomTestSettings.timeIndex2 <= -1 && bloomTestSettings.weather2 <= -1) {
+            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.gradient);
         } else {
-            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(timelapseTestSettings.weather1, timelapseTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch1);
-            int n = timelapseTestSettings.timeIndex2;
+            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch1);
+            int n = bloomTestSettings.timeIndex2;
             if (n > -1) {
-                this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(timelapseTestSettings.weather1, n, this.isOscillationDisabled, this.scratch2);
+                this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, n, this.isOscillationDisabled, this.scratch2);
             } else {
-                n = timelapseTestSettings.weather2;
+                n = bloomTestSettings.weather2;
                 if (n > -1) {
-                    this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(n, timelapseTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch2);
+                    this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(n, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch2);
                 }
             }
             Gradient.lerp(this.scratch1, this.scratch2, this.weatherTransitionPercent, this.gradient);
@@ -142,7 +145,7 @@ extends UtRenderer {
 
     private void updateGradientPreviewMode() {
         Gradient.copyFromTo(this.gradient, this.lastGradient);
-        this.weatherTransitionPercent = MathUtil.normalize(TimeUtil.elapsedRealTimeSince(TimelapseWallpaperService.get().weatherMan().resultTime()), 0.0f, 3000.0f, true);
+        this.weatherTransitionPercent = MathUtil.normalize(TimeUtil.elapsedRealTimeSince(BloomWallpaperService.get().weatherMan().resultTime()), 0.0f, 3000.0f, true);
         float f = (float)(System.currentTimeMillis() - this.startTime) / 1000.0f / 30.0f % 1.0f / 0.16666667f;
         int n = (int)Math.floor(f);
         f = MathUtil.map(f % 1.0f, 0.166f, 0.833f, 0.0f, 1.0f, true);
@@ -159,7 +162,7 @@ extends UtRenderer {
         int n;
         int n2;
         this.lastWeatherCondition = this.weatherCondition;
-        int[] nArray = TimelapseWallpaperService.get().weatherMan().result().conditions;
+        int[] nArray = BloomWallpaperService.get().weatherMan().result().conditions;
         int[] nArray2 = new int[nArray.length];
         int n3 = 0;
         for (n2 = 0; n2 < nArray.length; ++n2) {
@@ -204,7 +207,7 @@ extends UtRenderer {
 
     @Override
     protected void doUpdate() {
-        if (App.get().timelapseTestSettings != null && App.get().timelapseTestSettings.useCustomWeather) {
+        if (App.get().bloomTestSettings != null && App.get().bloomTestSettings.useCustomWeather) {
             this.updateGradientDebugMode();
         } else if (this.isPreview) {
             this.updateGradientPreviewMode();
@@ -257,7 +260,8 @@ extends UtRenderer {
     @Override
     protected void onNotVisible() {
         super.onNotVisible();
-        TimelapseWallpaperService.get().weatherMan().stop();
+        WeatherManager man = BloomWallpaperService.get().weatherMan();
+        if (man != null) man.stop();
     }
 
     @Override
@@ -270,7 +274,7 @@ extends UtRenderer {
     @Override
     public void onSurfaceCreated(GL10 gL10, EGLConfig eGLConfig) {
         super.onSurfaceCreated(gL10, eGLConfig);
-        this.program = new TimelapseProgram(this);
+        this.program = new BloomProgram(this);
         this.addChildNode(this.program);
     }
 
@@ -291,11 +295,13 @@ extends UtRenderer {
     @Override
     protected void onVisible() {
         super.onVisible();
-        TimelapseWallpaperService.get().weatherMan().start();
-        TimelapseWallpaperService.get().sunriseUtil().get();
-        TimelapseProgram timelapseProgram = this.program;
-        if (timelapseProgram != null) {
-            timelapseProgram.onVisible();
+        WeatherManager man = BloomWallpaperService.get().weatherMan();
+        if (man != null) man.start();
+        SunriseUtil util = BloomWallpaperService.get().sunriseUtil();
+        if (util != null) util.get();
+        BloomProgram bloomProgram = this.program;
+        if (bloomProgram != null) {
+            bloomProgram.onVisible();
         }
         this.schedulerRequestNow();
     }
@@ -303,13 +309,15 @@ extends UtRenderer {
     @Override
     protected void onVisibleAtLockScreen() {
         super.onVisibleAtLockScreen();
-        TimelapseProgram timelapseProgram = this.program;
-        if (timelapseProgram != null) {
-            timelapseProgram.onVisibleAtLockScreen();
+        BloomProgram bloomProgram = this.program;
+        if (bloomProgram != null) {
+            bloomProgram.onVisibleAtLockScreen();
         }
         this.schedulerRequestNow();
-        TimelapseWallpaperService.get().weatherMan().start();
-        TimelapseWallpaperService.get().sunriseUtil().get();
+        WeatherManager man = BloomWallpaperService.get().weatherMan();
+        if (man != null) man.start();
+        SunriseUtil util = BloomWallpaperService.get().sunriseUtil();
+        if (util != null) util.get();
     }
 
     public float unlockBottomFadeInAnimValue() {

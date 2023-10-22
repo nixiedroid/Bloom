@@ -1,6 +1,6 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
-public class TimelapseTestSettings {
+public class BloomTestSettings {
     public boolean shouldDisableOscillation;
     public int timeIndex1;
     public int timeIndex2;

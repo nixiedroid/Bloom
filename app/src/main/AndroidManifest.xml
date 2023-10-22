@@ -12,19 +12,21 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:name=".App"
-            android:appComponentFactory="androidx.core.app.CoreComponentFactory"
             android:extractNativeLibs="false"
             android:label="@string/app_name"
             tools:ignore="MissingApplicationIcon">
         <activity
-                android:name=".wallpapers.PermissionsActivity"
+                android:name=".preferences.PreferencesActivity"
                 android:directBootAware="true"
                 android:label="@string/permissions_activity_label"
-                android:theme="@style/Theme.AppCompat.Translucent"/>
+                android:exported="true"
+                android:theme="@style/AppTheme"
+        />
 
         <receiver
                 android:name=".TimezoneChangedReceiver"
@@ -35,11 +37,12 @@
         </receiver>
 
         <service
-                android:name=".wallpapers.timelapse.TimelapseWallpaperService"
+                android:name=".wallpapers.bloom.BloomWallpaperService"
                 android:directBootAware="true"
                 android:enabled="true"
                 android:exported="true"
-                android:label="@string/timelapse_label"
+                android:label="@string/bloom_label"
+                android:foregroundServiceType="location"
                 android:permission="android.permission.BIND_WALLPAPER">
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService"/>
@@ -47,7 +50,7 @@
 
             <meta-data
                     android:name="android.service.wallpaper"
-                    android:resource="@xml/timelapse_wallpaper"/>
+                    android:resource="@xml/bloom_live_wallpaper"/>
         </service>
     </application>
 

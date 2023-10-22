@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
+           android:description="@string/bloom_description"
+           android:thumbnail="@drawable/timelapse_thumb"
+           android:author="@string/collection_label"
+           android:showMetadataInPreview="true"
+           android:settingsActivity="com.nixiedroid.bloomlwp.preferences.PreferencesActivity"
+/>

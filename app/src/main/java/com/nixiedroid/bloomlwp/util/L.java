@@ -45,8 +45,10 @@ public class L {
     }
 
     private static void output(String message, int level, StackTraceElement[] stackTrace) {
+        String[] split;
         if (decorationEnabled) {
-            message = stackTrace[stackTrace.length-1].getClassName() + "() " + message;
+            split = stackTrace[3].getClassName().split("\\.");
+            message = split[split.length - 1] + "() " + message;
         }
         if (level == 0) {
             Log.v("zz", message);

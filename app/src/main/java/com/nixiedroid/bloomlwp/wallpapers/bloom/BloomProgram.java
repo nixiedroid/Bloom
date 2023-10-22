@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.timelapse;
+package com.nixiedroid.bloomlwp.wallpapers.bloom;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -7,14 +7,14 @@ import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.gl.ShaderProgram;
 import com.nixiedroid.bloomlwp.util.gl.TextureUtil;
 
-public class TimelapseProgram
+public class BloomProgram
 extends ShaderProgram {
     public final int aColorLocation;
     public final int aPositionLocation;
     public final int aTextureCoordinatesLocation;
     private final LowerGradientLayer lowerLayer;
     private final float[] matrix = new float[16];
-    private final TimelapseRenderer renderer;
+    private final BloomRenderer renderer;
     private long startTime;
     private final LowerGradientLayer transitionLowerLayer;
     private final UpperGradientLayer transitionUpperLayer;
@@ -24,9 +24,9 @@ extends ShaderProgram {
     public final int uTime;
     private final UpperGradientLayer upperLayer;
 
-    public TimelapseProgram(TimelapseRenderer timelapseRenderer) {
+    public BloomProgram(BloomRenderer bloomRenderer) {
         super(App.get(), R.raw.timelapse_vertex_shader, R.raw.timelapse_fragment_shader);
-        this.renderer = timelapseRenderer;
+        this.renderer = bloomRenderer;
         this.startTime = System.nanoTime();
         this.uMatrixLocation = GLES20.glGetUniformLocation(this.programId, "uMatrix");
         this.uTextureUnitLocation = GLES20.glGetUniformLocation(this.programId, "uTextureUnit");

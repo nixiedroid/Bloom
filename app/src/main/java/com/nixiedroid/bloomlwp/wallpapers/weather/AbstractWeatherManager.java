@@ -1,6 +1,3 @@
-/*
- * Decompiled with CFR 0.152.
- */
 package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import android.content.Context;
@@ -17,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public abstract class AbstractWeatherManager {
-    private final SharedPreferences cachePrefs;
+    protected final SharedPreferences cachePrefs;
     protected boolean isStopped;
     protected Handler pollHandler;
     protected WeatherVo previousResult;
