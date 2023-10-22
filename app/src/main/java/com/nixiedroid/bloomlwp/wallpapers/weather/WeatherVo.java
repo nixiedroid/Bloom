@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.util;
+package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import org.jetbrains.annotations.NotNull;
 

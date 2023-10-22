@@ -21,7 +21,11 @@ public class Quad {
         this.upperRightRgb = new float[4];
         this.lowerLeftRgb = new float[4];
         this.lowerRightRgb = new float[4];
-        this.cornerRgbs = new float[][]{this.upperLeftRgb, this.upperRightRgb, this.lowerLeftRgb, this.lowerRightRgb};
+        this.cornerRgbs = new float[][]{
+                this.upperLeftRgb,
+                this.upperRightRgb,
+                this.lowerLeftRgb,
+                this.lowerRightRgb};
         this.textureCoords = new float[]{
                 0.0f, 0.0f, 1.0f,
                 0.0f, 1.0f, 1.0f,
@@ -33,13 +37,13 @@ public class Quad {
     }
 
     public void applyMatrix() {
-        float[] fArray = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
+        float[] tempArray = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
         float[] result = new float[]{0.0f, 0.0f, 0.0f, 1.0f};
         for (int i = 0; i < this.transformedPositions.length; i += 3) {
-            fArray[0] = this.basePositions[i];
-            fArray[1] = this.basePositions[i + 1];
-            fArray[2] = this.basePositions[i + 2];
-            Matrix.multiplyMV(result, 0, this.matrix, 0, fArray, 0);
+            tempArray[0] = this.basePositions[i];
+            tempArray[1] = this.basePositions[i + 1];
+            tempArray[2] = this.basePositions[i + 2];
+            Matrix.multiplyMV(result, 0, this.matrix, 0, tempArray, 0);
             this.transformedPositions[i] = result[0];
             this.transformedPositions[i + 1] = result[1];
             this.transformedPositions[i + 2] = result[2];
@@ -129,36 +133,36 @@ public class Quad {
         this.setUpperRightRgb(fArray[0], fArray[1], fArray[2], f);
     }
 
-    public void writeColors(float[] fArray, int n) {
-        fArray[n] = upperLeftRgb[0];
-        fArray[n + 1] = upperLeftRgb[1];
-        fArray[n + 2] = upperLeftRgb[2];
-        fArray[n + 3] = upperLeftRgb[3];
+    public void writeColors(float[] arrayColors, int startIndex) {
+        arrayColors[startIndex] = upperLeftRgb[0];
+        arrayColors[startIndex + 1] = upperLeftRgb[1];
+        arrayColors[startIndex + 2] = upperLeftRgb[2];
+        arrayColors[startIndex + 3] = upperLeftRgb[3];
 
-        fArray[n + 4] = upperRightRgb[0];
-        fArray[n + 5] = upperRightRgb[1];
-        fArray[n + 6] = upperRightRgb[2];
-        fArray[n + 7] = upperRightRgb[3];
+        arrayColors[startIndex + 4] = upperRightRgb[0];
+        arrayColors[startIndex + 5] = upperRightRgb[1];
+        arrayColors[startIndex + 6] = upperRightRgb[2];
+        arrayColors[startIndex + 7] = upperRightRgb[3];
 
-        fArray[n + 8] = lowerRightRgb[0];
-        fArray[n + 9] = lowerRightRgb[1];
-        fArray[n + 10] = lowerRightRgb[2];
-        fArray[n + 11] = lowerRightRgb[3];
+        arrayColors[startIndex + 8] = lowerRightRgb[0];
+        arrayColors[startIndex + 9] = lowerRightRgb[1];
+        arrayColors[startIndex + 10] = lowerRightRgb[2];
+        arrayColors[startIndex + 11] = lowerRightRgb[3];
 
-        fArray[n + 12] = upperLeftRgb[0];
-        fArray[n + 13] = upperLeftRgb[1];
-        fArray[n + 14] = upperLeftRgb[2];
-        fArray[n + 15] = upperLeftRgb[3];
+        arrayColors[startIndex + 12] = upperLeftRgb[0];
+        arrayColors[startIndex + 13] = upperLeftRgb[1];
+        arrayColors[startIndex + 14] = upperLeftRgb[2];
+        arrayColors[startIndex + 15] = upperLeftRgb[3];
 
-        fArray[n + 16] = lowerRightRgb[0];
-        fArray[n + 17] = lowerRightRgb[1];
-        fArray[n + 18] = lowerRightRgb[2];
-        fArray[n + 19] = lowerRightRgb[3];
+        arrayColors[startIndex + 16] = lowerRightRgb[0];
+        arrayColors[startIndex + 17] = lowerRightRgb[1];
+        arrayColors[startIndex + 18] = lowerRightRgb[2];
+        arrayColors[startIndex + 19] = lowerRightRgb[3];
 
-        fArray[n + 20] = lowerLeftRgb[0];
-        fArray[n + 21] = lowerLeftRgb[1];
-        fArray[n + 22] = lowerLeftRgb[2];
-        fArray[n + 23] = lowerLeftRgb[3];
+        arrayColors[startIndex + 20] = lowerLeftRgb[0];
+        arrayColors[startIndex + 21] = lowerLeftRgb[1];
+        arrayColors[startIndex + 22] = lowerLeftRgb[2];
+        arrayColors[startIndex + 23] = lowerLeftRgb[3];
     }
 
     public enum Origin {

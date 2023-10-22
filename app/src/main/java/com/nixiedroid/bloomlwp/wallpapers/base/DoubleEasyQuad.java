@@ -6,8 +6,8 @@ public class DoubleEasyQuad {
     private final EasyQuad quad1;
     private final EasyQuad quad2;
 
-    public DoubleEasyQuad(boolean bl, float dividerPercent) {
-        this.isTopMain = bl;
+    public DoubleEasyQuad(boolean isTopMain, float dividerPercent) {
+        this.isTopMain = isTopMain;
         this.dividerPercent = dividerPercent;
         this.quad1 = new EasyQuad();
         this.quad2 = new EasyQuad();

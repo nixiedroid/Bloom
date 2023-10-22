@@ -72,8 +72,9 @@ public abstract class GLWallpaperService extends WallpaperService {
             }
         }
 
-        class WallpaperGLSurfaceView
+        public class WallpaperGLSurfaceView
         extends GLSurfaceView {
+
             WallpaperGLSurfaceView(Context context) {
                 super(context);
             }

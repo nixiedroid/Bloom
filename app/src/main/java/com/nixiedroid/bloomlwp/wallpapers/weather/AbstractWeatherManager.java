@@ -1,7 +1,7 @@
 /*
  * Decompiled with CFR 0.152.
  */
-package com.nixiedroid.bloomlwp.wallpapers.util;
+package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import android.content.Context;
 import android.content.Intent;

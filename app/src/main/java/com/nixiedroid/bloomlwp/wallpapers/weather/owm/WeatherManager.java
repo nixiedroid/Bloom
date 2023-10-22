@@ -1,24 +1,18 @@
-package com.nixiedroid.bloomlwp.wallpapers.util.owm;
+package com.nixiedroid.bloomlwp.wallpapers.weather.owm;
 
 import android.content.Context;
 import androidx.core.content.ContextCompat;
 import com.nixiedroid.bloomlwp.App;
-import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.wallpapers.util.AbstractWeatherManager;
-import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
-import com.nixiedroid.bloomlwp.wallpapers.util.WeatherVo;
-import com.nixiedroid.owm.implementation.OpenWeatherMapHelper;
-import com.nixiedroid.owm.implementation.callback.CurrentWeatherCallback;
-import com.nixiedroid.owm.model.common.Clouds;
-import com.nixiedroid.owm.model.common.Weather;
-import com.nixiedroid.owm.model.currentweather.CurrentWeather;
+import com.nixiedroid.bloomlwp.wallpapers.weather.AbstractWeatherManager;
+import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.WeatherVo;
 
 public class WeatherManager extends AbstractWeatherManager {
-    OpenWeatherMapHelper helper;
+
     public WeatherManager(Context context) {
         super(context);
-        helper = new OpenWeatherMapHelper(App.get().getString(R.string.OPEN_WEATHER_MAP_API_KEY));
+
     }
 
     @Override
@@ -31,24 +25,12 @@ public class WeatherManager extends AbstractWeatherManager {
             return;
         }
         try {
-            L.v("getting weather from OWN");
-            helper.getCurrentWeatherByCityName("Minsk", new CurrentWeatherCallback() {
-                @Override
-                public void onSuccess(CurrentWeather currentWeather) {
-                    previousResult = result;
-                    result = weatherVoFromWeather(currentWeather);
-                    resultTime = TimeUtil.nowMs();
-                    L.v("successful result: " + result.toString());
-                    afterResult(Result.OKAY, result);
-                }
-
-                @Override
-                public void onFailure(Throwable throwable) {
-                    throwable.printStackTrace();
-                }
-            });
-
-
+            previousResult = result;
+            result = new WeatherVo();
+            result.conditions = new int[]{4};
+            resultTime = TimeUtil.nowMs();
+            L.v("successful result: " + result.toString());
+            afterResult(Result.OKAY, result);
         } catch (SecurityException var3) {
             L.w("no permissions");
             this.afterResult(AbstractWeatherManager.Result.FAILED_NO_PERMISSION);

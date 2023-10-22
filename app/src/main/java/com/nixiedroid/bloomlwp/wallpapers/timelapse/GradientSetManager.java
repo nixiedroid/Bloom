@@ -8,8 +8,8 @@ import java.util.List;
 
 public class GradientSetManager {
     public List<GradientSet> gradientSets;
-    private Gradient scratch1 = new Gradient();
-    private Gradient scratch2 = new Gradient();
+    private final Gradient scratch1 = new Gradient();
+    private final Gradient scratch2 = new Gradient();
 
     public GradientSetManager() {
         GradientSet gradientSet = new GradientSet(new Gradient("#F8C66F", "#CE93D8", "#0F284C", "#455A64", "#212121"), new Gradient("#CE93D8", "#F48FB1", "#2B1780", "#0D47A1", "#0A3880"), new Gradient("#8EF6D6", "#FFF59D", "#1A1885", "#9575CD", "#006BC3"), new Gradient("#4fadf6", "#93c7fa", "#303f9f", "#52b6b3", "#1a3da3"), new Gradient("#FFAB91", "#CE93D8", "#311B92", "#1976D2", "#1A237E"), new Gradient("#DC5A7A", "#9739B2", "#311B92", "#6A189A", "#311B92"));

@@ -35,10 +35,10 @@ extends ShaderProgram {
         this.aPositionLocation = GLES20.glGetAttribLocation(this.programId, "aPosition");
         this.aTextureCoordinatesLocation = GLES20.glGetAttribLocation(this.programId, "aTextureCoordinates");
         this.aColorLocation = GLES20.glGetAttribLocation(this.programId, "aColor");
-        int n = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_top_gradient_1440 : R.drawable.timelapse_top_gradient_1080;
-        int upperTextureId = TextureUtil.loadTexture(App.get(), n, false);
-        n = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_bottom_gradient_1440 : R.drawable.timelapse_bottom_gradient_1080;
-        int lowerTextureId = TextureUtil.loadTexture(App.get(), n, false);
+        int gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_top_gradient_1440 : R.drawable.timelapse_top_gradient_1080;
+        int upperTextureId = TextureUtil.loadTexture(App.get(), gradientResId, false);
+        gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_bottom_gradient_1440 : R.drawable.timelapse_bottom_gradient_1080;
+        int lowerTextureId = TextureUtil.loadTexture(App.get(), gradientResId, false);
         this.transitionUpperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, true);
         this.upperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, false);
         this.transitionLowerLayer = new LowerGradientLayer(this.renderer, this, lowerTextureId, true);

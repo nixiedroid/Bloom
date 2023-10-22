@@ -18,28 +18,22 @@ public class MathUtil {
         return Math.min(value, high);
     }
 
-    public static float lerp(float start, float end, float coef) {
-        return end + (coef - end) * start;
+    public static float lerp(float start, float end, float coeff) {
+        return end + (coeff - end) * start;
     }
 
-    public static float map(float f, float f2, float f3, float f4, float f5, boolean bl) {
-        f = f2 = MathUtil.lerp(MathUtil.normalize(f, f2, f3), f4, f5);
-        if (bl) {
-            f = MathUtil.clamp(f2, f4, f5);
-        }
-        return f;
+    public static float map(float start, float delta, float end, float end2, float coeff, boolean doClamp) {
+        float lerp = lerp(normalize(start, delta, end), end2, coeff);
+        return doClamp ? clamp(lerp, end2, coeff) : lerp;
     }
 
-    public static float normalize(float f, float f2, float f3) {
-        return (f - f2) / (f3 - f2);
+    public static float normalize(float start, float delta, float end) {
+        return (start - delta) / (end - delta);
     }
 
-    public static float normalize(float f, float f2, float f3, boolean bl) {
-        f = f2 = (f - f2) / (f3 - f2);
-        if (bl) {
-            f = MathUtil.clamp(f2, 0.0f, 1.0f);
-        }
-        return f;
+    public static float normalize(float start, float delta, float end, boolean doClamp) {
+        float f4 = normalize(start, delta, end);
+        return doClamp ? clamp(f4, 0.0f, 1.0f) : f4;
     }
 
 }

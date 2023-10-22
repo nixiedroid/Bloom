@@ -17,8 +17,8 @@ import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.util.MathUtil;
 import com.nixiedroid.bloomlwp.util.Terps;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
-import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
-import com.nixiedroid.bloomlwp.wallpapers.util.WeatherVo;
+import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.WeatherVo;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -112,7 +112,9 @@ extends UtRenderer {
         } else {
             this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(f2, true ^ this.isOscillationDisabled, this.gradient);
             if (this.weatherTransitionPercent != f) {
-                this.engine.notifyColorsChanged();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    this.engine.notifyColorsChanged();
+                }
             }
         }
     }
@@ -236,10 +238,13 @@ extends UtRenderer {
                     Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
                     Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)), 0);
         } else {
-            return new WallpaperColors(Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
-                    Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
-                    Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                return new WallpaperColors(Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
+                        Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
+                        Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)));
+            }
         }
+       return null;
     }
 
     @Override

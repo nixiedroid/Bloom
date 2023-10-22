@@ -76,11 +76,11 @@ extends Layer {
         }
     }
 
-    public void setDimensions(int n, int n2) {
-        this.viewportWidth = n;
-        this.defaultY = (float)n2 * 0.296875f;
-        this.height = (float)n2 * 0.703125f;
-        this.unlockStartY = (float)n2 * 0.66f;
+    public void setDimensions(int width, int height) {
+        this.viewportWidth = width;
+        this.defaultY = (float) height * 0.296875f;
+        this.height = (float) height * 0.703125f;
+        this.unlockStartY = (float) height * 0.66f;
         this.y = this.defaultY - 1.0f;
     }
 }

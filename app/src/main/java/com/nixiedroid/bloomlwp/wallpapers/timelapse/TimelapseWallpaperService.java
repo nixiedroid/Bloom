@@ -11,8 +11,8 @@ import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.wallpapers.PermissionsActivity;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtWallpaperService;
-import com.nixiedroid.bloomlwp.wallpapers.util.owm.SunriseUtil;
-import com.nixiedroid.bloomlwp.wallpapers.util.owm.WeatherManager;
+import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
 
 public class TimelapseWallpaperService
 extends UtWallpaperService {
@@ -21,11 +21,11 @@ extends UtWallpaperService {
 
         @Override
         public void onReceive(Context object, Intent intent) {
-            boolean bl = ContextCompat.checkSelfPermission(TimelapseWallpaperService.this, "android.permission.ACCESS_FINE_LOCATION") == 0;
+            boolean hasPermission = ContextCompat.checkSelfPermission(TimelapseWallpaperService.this, "android.permission.ACCESS_FINE_LOCATION") == 0;
             L.v("got this - has permission? " );
-            if (bl) {
-                TimelapseWallpaperService.this.weatherMan.start();
-                TimelapseWallpaperService.this.sunriseUtil.get();
+            if (hasPermission) {
+                weatherMan.start();
+                sunriseUtil.get();
             }
         }
     };

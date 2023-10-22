@@ -20,10 +20,9 @@ import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.util.Util;
 import com.nixiedroid.bloomlwp.util.gl.GlUtil;
-import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
 
 public abstract class UtWallpaperService
-extends GLWallpaperService {
+        extends GLWallpaperService {
     @Override
     protected int defaultGlSurfaceViewRenderMode() {
         return 0;
@@ -55,9 +54,10 @@ extends GLWallpaperService {
     }
 
     public class UtEngine
-    extends GLWallpaperService.GLEngine {
-        private DeviceEventsReceiver deviceEventsReceiver;
+            extends GLWallpaperService.GLEngine {
         private final int displayRotation;
+        private final float[] tempGrav = new float[3];
+        private DeviceEventsReceiver deviceEventsReceiver;
         private GestureDetectorCompat gestureDetector;
         private Sensor gravitySensor;
         private GravitySensorListener gravitySensorListener;
@@ -65,7 +65,6 @@ extends GLWallpaperService {
         private KeyguardManager keyMan;
         private UtRenderer renderer;
         private SensorManager sensorManager;
-        private final float[] tempGrav = new float[3];
 
         public UtEngine() {
             this.displayRotation = (
@@ -89,8 +88,7 @@ extends GLWallpaperService {
         private void unregisterReceivers() {
             try {
                 unregisterReceiver(deviceEventsReceiver);
-            }
-            catch (Exception ignored) {
+            } catch (Exception ignored) {
             }
         }
 
@@ -141,11 +139,11 @@ extends GLWallpaperService {
                 this.setRenderer(this.renderer);
                 onWallpaperAttached(this.renderer);
                 this.registerReceivers();
-                this.sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+                this.sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
                 if (handlesGravity()) {
                     this.initGravitySensor();
                 }
-                this.keyMan = (KeyguardManager)getSystemService(Context.KEYGUARD_SERVICE);
+                this.keyMan = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
                 if (handlesTouchesAndGestures()) {
                     this.gestureDetector = new GestureDetectorCompat(UtWallpaperService.this, new GestureListener());
                 }
@@ -201,18 +199,18 @@ extends GLWallpaperService {
         }
 
         public class DeviceEventsReceiver
-        extends BroadcastReceiver {
+                extends BroadcastReceiver {
             @Override
             public void onReceive(Context object, Intent intent) {
                 if (renderer == null) {
                     return;
                 }
-                switch (intent.getAction()){
+                switch (intent.getAction()) {
                     case "android.intent.action.SCREEN_OFF":
                         L.d("screen-off");
                         if (handlesGravity()) {
                             renderer.onScreenOff();
-                            sensorManager.unregisterListener((SensorEventListener) this);
+                            sensorManager.unregisterListener(gravitySensorListener);
                             break;
                         }
                         renderer.onScreenOff();
@@ -230,7 +228,7 @@ extends GLWallpaperService {
         }
 
         public class GestureListener
-        extends GestureDetector.SimpleOnGestureListener {
+                extends GestureDetector.SimpleOnGestureListener {
             @Override
             public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent2, float f, float f2) {
                 renderer.onFling();
@@ -239,7 +237,7 @@ extends GLWallpaperService {
         }
 
         public class GravitySensorListener
-        implements SensorEventListener {
+                implements SensorEventListener {
             @Override
             public void onAccuracyChanged(Sensor sensor, int n) {
             }

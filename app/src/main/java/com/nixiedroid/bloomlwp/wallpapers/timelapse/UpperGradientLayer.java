@@ -12,7 +12,7 @@ extends Layer {
     private float height;
     private final boolean isTransitionLayer;
     private final TimelapseProgram program;
-    private DoubleEasyQuad quad;
+    private final DoubleEasyQuad quad;
     private final TimelapseRenderer renderer;
     private final int textureId;
     private float unlockStartY;

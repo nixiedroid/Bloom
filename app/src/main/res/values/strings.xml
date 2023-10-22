@@ -1,8 +1,10 @@
 <resources>
     <string name="OPEN_WEATHER_MAP_API_KEY">KEY</string>
     <string name="app_name">Bloom LWP</string>
-    <string name="permissions_activity_label" />
-    <string name="timelapse_description">Watch your day unfold in beautiful gradients as Time Lapse reacts to time and weather conditions.</string>
+    <string name="permissions_activity_label"/>
+    <string name="timelapse_description">Watch your day unfold in beautiful gradients as Time Lapse reacts to time and
+        weather conditions.
+    </string>
     <string name="timelapse_label">Aurora, Time lapse</string>
     <string name="timelapse_tester_activity_label">Timelapse tester</string>
     <string name="collection_label">Live data series</string>

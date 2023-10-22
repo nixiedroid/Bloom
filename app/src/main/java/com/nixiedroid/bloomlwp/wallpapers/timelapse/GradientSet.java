@@ -2,7 +2,7 @@ package com.nixiedroid.bloomlwp.wallpapers.timelapse;
 
 import com.nixiedroid.bloomlwp.util.MathUtil;
 import com.nixiedroid.bloomlwp.util.Terps;
-import com.nixiedroid.bloomlwp.wallpapers.util.TimeUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,42 +43,42 @@ public class GradientSet {
     }
 
 
-    public float calcSlidingIndex(float f) {
-        if (this.night1.contains(f)) {
+    public float calcSlidingIndex(float timeValue) {
+        if (this.night1.contains(timeValue)) {
             return 0.0f;
         }
-        if (this.nightToDawn.contains(f)) {
-            return this.nightToDawn.normalize(f) + 0.0f;
+        if (this.nightToDawn.contains(timeValue)) {
+            return this.nightToDawn.normalize(timeValue) + 0.0f;
         }
-        if (this.dawn.contains(f)) {
+        if (this.dawn.contains(timeValue)) {
             return 1.0f;
         }
-        if (this.dawnToSunrise.contains(f)) {
-            return this.dawnToSunrise.normalize(f) + 1.0f;
+        if (this.dawnToSunrise.contains(timeValue)) {
+            return this.dawnToSunrise.normalize(timeValue) + 1.0f;
         }
-        if (this.sunrise.contains(f)) {
+        if (this.sunrise.contains(timeValue)) {
             return 2.0f;
         }
-        if (this.sunriseToDaytime.contains(f)) {
-            return this.sunriseToDaytime.normalize(f) + 2.0f;
+        if (this.sunriseToDaytime.contains(timeValue)) {
+            return this.sunriseToDaytime.normalize(timeValue) + 2.0f;
         }
-        if (this.daytime.contains(f)) {
+        if (this.daytime.contains(timeValue)) {
             return 3.0f;
         }
-        if (this.daytimeToSunset.contains(f)) {
-            return this.daytimeToSunset.normalize(f) + 3.0f;
+        if (this.daytimeToSunset.contains(timeValue)) {
+            return this.daytimeToSunset.normalize(timeValue) + 3.0f;
         }
-        if (this.sunset.contains(f)) {
+        if (this.sunset.contains(timeValue)) {
             return 4.0f;
         }
-        if (this.sunsetToDusk.contains(f)) {
-            return this.sunsetToDusk.normalize(f) + 4.0f;
+        if (this.sunsetToDusk.contains(timeValue)) {
+            return this.sunsetToDusk.normalize(timeValue) + 4.0f;
         }
-        if (this.dusk.contains(f)) {
+        if (this.dusk.contains(timeValue)) {
             return 5.0f;
         }
-        if (this.duskToNight.contains(f)) {
-            return 5.0f + this.duskToNight.normalize(f);
+        if (this.duskToNight.contains(timeValue)) {
+            return 5.0f + this.duskToNight.normalize(timeValue);
         }
         return 0.0f;
     }
@@ -107,46 +107,46 @@ public class GradientSet {
     public void updateRanges() {
         float sunriseDayPercent = TimeUtil.sunriseDayPercent();
         float sunsetDayPercent = TimeUtil.sunsetDayPercent();
-        float f = sunriseDayPercent - 0.041666668f;
-        this.night1.set(0.0f, f);
-        float f2 = sunriseDayPercent - 0.027777778f;
-        this.nightToDawn.set(f, f2);
-        float f3 = sunriseDayPercent - 0.013888889f;
-        this.dawn.set(f2, f3);
-        this.dawnToSunrise.set(f3, sunriseDayPercent - 0.0f);
-        float f4 = sunriseDayPercent + 0.013888889f;
-        this.sunrise.set(sunriseDayPercent + 0.0f, f4);
-        float f5 = sunriseDayPercent + 0.027777778f;
-        this.sunriseToDaytime.set(f4, f5);
-        float f6 = sunsetDayPercent - 0.027777778f;
-        this.daytime.set(f5, f6);
-        float f7 = sunsetDayPercent - 0.013888889f;
-        this.daytimeToSunset.set(f6, f7);
-        this.sunset.set(f7, sunsetDayPercent - 0.0f);
-        float f8 = 0.013888889f + sunsetDayPercent;
-        this.sunsetToDusk.set(0.0f + sunsetDayPercent, f8);
-        float f9 = 0.027777778f + sunsetDayPercent;
-        this.dusk.set(f8, f9);
-        float f10 = sunsetDayPercent + 0.041666668f;
-        this.duskToNight.set(f9, f10);
-        this.night2.set(f10, 1.01f);
+        float night = sunriseDayPercent - 0.041666668f;
+        this.night1.set(0.0f, night);
+        float nightToDawn = sunriseDayPercent - 0.027777778f;
+        this.nightToDawn.set(night, nightToDawn);
+        float dawn = sunriseDayPercent - 0.013888889f;
+        this.dawn.set(nightToDawn, dawn);
+        this.dawnToSunrise.set(dawn, sunriseDayPercent - 0.0f);
+        float sunrise = sunriseDayPercent + 0.013888889f;
+        this.sunrise.set(sunriseDayPercent + 0.0f, sunrise);
+        float sunriseToDaytime = sunriseDayPercent + 0.027777778f;
+        this.sunriseToDaytime.set(sunrise, sunriseToDaytime);
+        float daytime = sunsetDayPercent - 0.027777778f;
+        this.daytime.set(sunriseToDaytime, daytime);
+        float daytimeToSunset = sunsetDayPercent - 0.013888889f;
+        this.daytimeToSunset.set(daytime, daytimeToSunset);
+        this.sunset.set(daytimeToSunset, sunsetDayPercent - 0.0f);
+        float sunsetToDusk = 0.013888889f + sunsetDayPercent;
+        this.sunsetToDusk.set(0.0f + sunsetDayPercent, sunsetToDusk);
+        float dusk = 0.027777778f + sunsetDayPercent;
+        this.dusk.set(sunsetToDusk, dusk);
+        float duskToNight = sunsetDayPercent + 0.041666668f;
+        this.duskToNight.set(dusk, duskToNight);
+        this.night2.set(duskToNight, 1.01f);
     }
 
     public static class Range {
-        float gte;
-        float lt;
+        float start;
+        float end;
 
-        public boolean contains(float f) {
-            return f >= this.gte && f < this.lt;
+        public boolean contains(float time) {
+            return time >= this.start && time < this.end;
         }
 
         public float normalize(float f) {
-            return MathUtil.normalize(f, this.gte, this.lt);
+            return MathUtil.normalize(f, this.start, this.end);
         }
 
-        public void set(float f, float f2) {
-            this.gte = f;
-            this.lt = f2;
+        public void set(float start, float end) {
+            this.start = start;
+            this.end = end;
         }
     }
 }

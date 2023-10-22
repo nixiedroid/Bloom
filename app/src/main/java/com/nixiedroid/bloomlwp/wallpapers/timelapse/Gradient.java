@@ -25,40 +25,40 @@ public class Gradient {
         this.lower2 = ColUtil.stringToRgb(lower2);
     }
 
-    public static void copyFromTo(final Gradient gradient, final Gradient gradient2) {
-        final float[] upper1 = gradient2.upper1;
-        final float[] upper2 = gradient.upper1;
+    public static void copyFromTo(final Gradient from, final Gradient to) {
+        final float[] upper1 = to.upper1;
+        final float[] upper2 = from.upper1;
         upper1[0] = upper2[0];
         upper1[1] = upper2[1];
         upper1[2] = upper2[2];
-        final float[] upper3 = gradient2.upper2;
-        final float[] upper4 = gradient.upper2;
+        final float[] upper3 = to.upper2;
+        final float[] upper4 = from.upper2;
         upper3[0] = upper4[0];
         upper3[1] = upper4[1];
         upper3[2] = upper4[2];
-        final float[] middle = gradient2.middle;
-        final float[] middle2 = gradient.middle;
+        final float[] middle = to.middle;
+        final float[] middle2 = from.middle;
         middle[0] = middle2[0];
         middle[1] = middle2[1];
         middle[2] = middle2[2];
-        final float[] lower1 = gradient2.lower1;
-        final float[] lower2 = gradient.lower1;
+        final float[] lower1 = to.lower1;
+        final float[] lower2 = from.lower1;
         lower1[0] = lower2[0];
         lower1[1] = lower2[1];
         lower1[2] = lower2[2];
-        final float[] lower3 = gradient2.lower2;
-        final float[] lower4 = gradient.lower2;
+        final float[] lower3 = to.lower2;
+        final float[] lower4 = from.lower2;
         lower3[0] = lower4[0];
         lower3[1] = lower4[1];
         lower3[2] = lower4[2];
     }
 
-    public static void lerp(Gradient gradient, Gradient gradient2, float f, Gradient gradient3) {
-        ColUtil.lerpRgb(f, gradient.upper1, gradient2.upper1, gradient3.upper1);
-        ColUtil.lerpRgb(f, gradient.upper2, gradient2.upper2, gradient3.upper2);
-        ColUtil.lerpRgb(f, gradient.middle, gradient2.middle, gradient3.middle);
-        ColUtil.lerpRgb(f, gradient.lower1, gradient2.lower1, gradient3.lower1);
-        ColUtil.lerpRgb(f, gradient.lower2, gradient2.lower2, gradient3.lower2);
+    public static void lerp(Gradient first, Gradient second, float coeff, Gradient output) {
+        ColUtil.lerpRgb(coeff, first.upper1, second.upper1, output.upper1);
+        ColUtil.lerpRgb(coeff, first.upper2, second.upper2, output.upper2);
+        ColUtil.lerpRgb(coeff, first.middle, second.middle, output.middle);
+        ColUtil.lerpRgb(coeff, first.lower1, second.lower1, output.lower1);
+        ColUtil.lerpRgb(coeff, first.lower2, second.lower2, output.lower2);
     }
 }
 
