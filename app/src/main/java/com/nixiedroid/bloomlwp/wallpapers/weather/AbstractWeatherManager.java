@@ -20,6 +20,7 @@ public abstract class AbstractWeatherManager {
     protected WeatherVo previousResult;
     protected WeatherVo result;
     protected long resultTime;
+
     protected Runnable runnable;
 
     public AbstractWeatherManager(Context context) {
@@ -106,6 +107,9 @@ public abstract class AbstractWeatherManager {
         this.get();
     }
 
+    public void destroy() {
+        this.isStopped = true;
+    }
     public void stop() {
         this.isStopped = true;
     }

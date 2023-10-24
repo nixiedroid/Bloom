@@ -16,7 +16,6 @@
         />
     </LinearLayout>
     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
-
         <EditText
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -44,6 +43,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:text="@string/button_location_dialog"
+        />
+    </LinearLayout>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content">
+        <Button
+                android:id="@+id/updateWeatherNow"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:text="@string/button_update_weather"
         />
     </LinearLayout>
 

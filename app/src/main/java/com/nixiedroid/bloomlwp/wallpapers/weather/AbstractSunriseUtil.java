@@ -1,7 +1,6 @@
 package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import android.content.Intent;
-import android.graphics.PointF;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
@@ -9,17 +8,17 @@ import com.nixiedroid.bloomlwp.util.L;
 import java.util.Date;
 
 public abstract class AbstractSunriseUtil {
-    protected PointF latLon;
+   // protected PointF latLon;
     protected float sunriseDayPercent;
     protected float sunsetDayPercent;
 
     public static float[] getSunriseSunset(float latitude, float longitude) {
         CalendarAstronomer calendarAstronomer = new CalendarAstronomer(longitude, latitude);
-        long sunRiseSet = calendarAstronomer.getSunRiseSet(true);
-        long sunRiseSet2 = calendarAstronomer.getSunRiseSet(false);
-        L.v("sunrise : " + new Date(sunRiseSet));
-        L.v("sunset  : " + new Date(sunRiseSet2));
-        return new float[]{TimeUtil.epochMsToDayPercent(sunRiseSet), TimeUtil.epochMsToDayPercent(sunRiseSet2)};
+        long sunRise = calendarAstronomer.getSunRiseSet(true);
+        long sunSet = calendarAstronomer.getSunRiseSet(false);
+        L.v("sunrise : " + new Date(sunRise));
+        L.v("sunset  : " + new Date(sunSet));
+        return new float[]{TimeUtil.epochMsToDayPercent(sunRise), TimeUtil.epochMsToDayPercent(sunSet)};
     }
 
     protected void afterResult(Result result) {

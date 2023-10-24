@@ -13,6 +13,7 @@ import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtWallpaperService;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
+import android.Manifest;
 
 public class BloomWallpaperService
 extends UtWallpaperService {
@@ -22,7 +23,7 @@ extends UtWallpaperService {
         @Override
         public void onReceive(Context object, Intent intent) {
             L.v("got this - has permission? " );
-            if (ContextCompat.checkSelfPermission(BloomWallpaperService.this, "android.permission.ACCESS_FINE_LOCATION") == 0) {
+            if (ContextCompat.checkSelfPermission(BloomWallpaperService.this, Manifest.permission.ACCESS_COARSE_LOCATION) == 0) {
                 weatherMan.start();
                 sunriseUtil.get();
             }
@@ -38,11 +39,10 @@ extends UtWallpaperService {
     private void initPermissionsRelated(UtRenderer renderer) {
         if (!renderer.isPreview()) {
             LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.permissionReceiver, new IntentFilter("permission_result"));
-            boolean hasPermission = ContextCompat.checkSelfPermission(this, "android.permission.ACCESS_FINE_LOCATION") == 0;
+            boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == 0;
             L.d("has fine location permissions? " + hasPermission);
             if (!hasPermission) {
                 Toast.makeText(App.get(),"No location permission granted. \nPlease, grant it in settings", Toast.LENGTH_LONG).show();
-              //  PreferencesActivity.launchActivity(this, 2);
             }
         }
     }
@@ -74,7 +74,7 @@ extends UtWallpaperService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.weatherMan.stop();
+        this.weatherMan.destroy();
         LocalBroadcastManager.getInstance(App.get()).unregisterReceiver(this.permissionReceiver);
         instance = null;
     }

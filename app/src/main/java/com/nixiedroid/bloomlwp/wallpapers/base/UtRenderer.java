@@ -153,14 +153,14 @@ public abstract class UtRenderer extends RenderNode implements GLSurfaceView.Ren
     }
 
     protected void onVisible() {
-        L.d();
+        L.d("On visible");
         isVisible = true;
         scheduler.setVisible(true);
         scheduler.requestRenderNow();
     }
 
     protected void onVisibleAtLockScreen() {
-        L.d();
+        L.d("On visible lockscreen");
         isVisible = true;
         isLockScreen = true;
         scheduler.setVisible(true);

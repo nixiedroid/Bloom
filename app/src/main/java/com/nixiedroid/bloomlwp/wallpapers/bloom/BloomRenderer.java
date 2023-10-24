@@ -28,18 +28,17 @@ import javax.microedition.khronos.opengles.GL10;
 public class BloomRenderer
 extends UtRenderer {
     private static final int[] weatherConditionByPriority = new int[]{8, 6, 7, 2, 3, 4, 5, 9, 1, 0};
-    private Gradient gradient;
-    private GradientSetManager gradientMan;
+    private final Gradient gradient;
+    private final GradientSetManager gradientMan;
     private boolean isOscillationDisabled;
-    private Gradient lastGradient;
+    private final Gradient lastGradient;
     private int lastWeatherCondition;
     private BloomProgram program;
-    private Gradient scratch1 = new Gradient();
-    private Gradient scratch2 = new Gradient();
-    private int startSlidingIndex;
-    private long startTime;
-    private BroadcastReceiver sunriseReceiver = new BroadcastReceiver(){
-
+    private final Gradient scratch1 = new Gradient();
+    private final Gradient scratch2 = new Gradient();
+    private final int startSlidingIndex;
+    private final long startTime;
+    private final BroadcastReceiver sunriseReceiver = new BroadcastReceiver(){
         @Override
         public void onReceive(Context object, Intent intent) {
             final boolean booleanExtra = intent.getBooleanExtra("sunrise_result", false);
@@ -54,7 +53,6 @@ extends UtRenderer {
     private AnimFloat unlockTopFadeoutAnim;
     private AnimFloat unlockTopSlideAnim;
     private final BroadcastReceiver weatherBroadcastReceiver = new BroadcastReceiver(){
-
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getBooleanExtra("weather_result", false)) {
@@ -83,8 +81,9 @@ extends UtRenderer {
 
         intentFilter = new IntentFilter("weather_result");
         LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.weatherBroadcastReceiver, intentFilter);
+
         this.startTime = System.currentTimeMillis();
-        this.startSlidingIndex = (int)this.gradientMan.gradientSetByCondition(this.weatherCondition).calcSlidingIndex(TimeUtil.nowDayPercent());
+        this.startSlidingIndex = (int)gradientMan.gradientSetByCondition(this.weatherCondition).calcSlidingIndex(TimeUtil.nowDayPercent());
     }
 
     private void initUnlockAnims() {
@@ -105,16 +104,15 @@ extends UtRenderer {
 
     private void updateGradient() {
         Gradient.copyFromTo(this.gradient, this.lastGradient);
-        long l = TimeUtil.elapsedRealTimeSince(BloomWallpaperService.get().weatherMan().resultTime());
-        float f = this.weatherTransitionPercent;
-        this.weatherTransitionPercent = MathUtil.normalize(l, 0.0f, 3000.0f, true);
-        float f2 = TimeUtil.nowDayPercent();
-        float f3 = this.weatherTransitionPercent;
-        if (f3 < 1.0f) {
-            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, f3, f2, this.isOscillationDisabled ^ true, this.gradient);
+        long elapsedTimeSinceLastWeatherUpdate = TimeUtil.elapsedRealTimeSince(BloomWallpaperService.get().weatherMan().resultTime());
+        float prevWTP = this.weatherTransitionPercent;
+        this.weatherTransitionPercent = MathUtil.normalize(elapsedTimeSinceLastWeatherUpdate, 0.0f, 3000.0f, true);
+        float dayPercent = TimeUtil.nowDayPercent();
+        if (this.weatherTransitionPercent < 1.0f) {
+            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, this.weatherTransitionPercent, dayPercent, !isOscillationDisabled, gradient);
         } else {
-            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(f2, true ^ this.isOscillationDisabled, this.gradient);
-            if (this.weatherTransitionPercent != f) {
+            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(dayPercent, !isOscillationDisabled, gradient);
+            if (this.weatherTransitionPercent != prevWTP) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     this.engine.notifyColorsChanged();
                 }
@@ -152,37 +150,35 @@ extends UtRenderer {
         f = ((float)(n % 6) + f + (float)this.startSlidingIndex) % 6.0f;
         float f2 = this.weatherTransitionPercent;
         if (f2 < 1.0f) {
-            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f, this.isOscillationDisabled ^ true, this.gradient);
+            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f, !this.isOscillationDisabled, this.gradient);
         } else {
-            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingSlidingIndex(f, true ^ this.isOscillationDisabled, this.gradient);
+            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingSlidingIndex(f, !this.isOscillationDisabled, this.gradient);
         }
     }
 
     private void updateWeatherCondition() {
-        int n;
-        int n2;
+
         this.lastWeatherCondition = this.weatherCondition;
-        int[] nArray = BloomWallpaperService.get().weatherMan().result().conditions;
-        int[] nArray2 = new int[nArray.length];
-        int n3 = 0;
-        for (n2 = 0; n2 < nArray.length; ++n2) {
-            int[] nArray3;
-            for (n = 0; n < (nArray3 = weatherConditionByPriority).length; ++n) {
-                if (nArray3[n] != nArray[n2]) continue;
-                nArray2[n2] = n;
+        int[] weatherConditions = BloomWallpaperService.get().weatherMan().result().conditions;
+        int[] priorities = new int[weatherConditions.length];
+        for (int i = 0; i < weatherConditions.length; ++i) {
+            for (int k = 0; k < weatherConditionByPriority.length; ++k) {
+                if (weatherConditionByPriority[k] == weatherConditions[i]) {
+                    priorities[i] = k;
+                }
             }
         }
-        int n4 = Integer.MAX_VALUE;
-        n = -1;
-        for (n2 = n3; n2 < nArray2.length; ++n2) {
-            n3 = n4;
-            if (nArray2[n2] < n4) {
-                n3 = nArray2[n2];
-                n = n2;
+        int maxValue = Integer.MAX_VALUE;
+        int prevMaxValue = Integer.MAX_VALUE;
+        int resultIndex = -1;
+        for (int i = 0; i < priorities.length; ++i) {
+            if (priorities[i] < prevMaxValue) {
+                maxValue = priorities[i];
+                resultIndex = i;
             }
-            n4 = n3;
+            prevMaxValue = maxValue;
         }
-        this.weatherCondition = nArray[n];
+        this.weatherCondition = weatherConditions[resultIndex];
         L.v(WeatherVo.conditionString(this.weatherCondition));
     }
 
@@ -309,15 +305,15 @@ extends UtRenderer {
     @Override
     protected void onVisibleAtLockScreen() {
         super.onVisibleAtLockScreen();
+        WeatherManager man = BloomWallpaperService.get().weatherMan();
+        if (man != null) man.start();
+        SunriseUtil util = BloomWallpaperService.get().sunriseUtil();
+        if (util != null) util.get();
         BloomProgram bloomProgram = this.program;
         if (bloomProgram != null) {
             bloomProgram.onVisibleAtLockScreen();
         }
         this.schedulerRequestNow();
-        WeatherManager man = BloomWallpaperService.get().weatherMan();
-        if (man != null) man.start();
-        SunriseUtil util = BloomWallpaperService.get().sunriseUtil();
-        if (util != null) util.get();
     }
 
     public float unlockBottomFadeInAnimValue() {
