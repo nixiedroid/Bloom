@@ -19,7 +19,7 @@ import com.nixiedroid.bloomlwp.util.Terps;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.WeatherVo;
-import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
 
 import javax.microedition.khronos.egl.EGLConfig;

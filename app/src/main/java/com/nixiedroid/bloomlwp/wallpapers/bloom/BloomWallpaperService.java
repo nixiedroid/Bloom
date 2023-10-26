@@ -11,7 +11,7 @@ import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtRenderer;
 import com.nixiedroid.bloomlwp.wallpapers.base.UtWallpaperService;
-import com.nixiedroid.bloomlwp.wallpapers.weather.owm.SunriseUtil;
+import com.nixiedroid.bloomlwp.wallpapers.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
 import android.Manifest;
 

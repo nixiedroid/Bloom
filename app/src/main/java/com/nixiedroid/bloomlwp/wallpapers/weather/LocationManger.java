@@ -1,4 +1,4 @@
-package com.nixiedroid.bloomlwp.wallpapers.weather.owm;
+package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import android.Manifest;
 import androidx.core.content.ContextCompat;

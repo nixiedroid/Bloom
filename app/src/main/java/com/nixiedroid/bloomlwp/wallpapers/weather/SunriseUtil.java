@@ -1,12 +1,10 @@
-package com.nixiedroid.bloomlwp.wallpapers.weather.owm;
+package com.nixiedroid.bloomlwp.wallpapers.weather;
 
-import android.graphics.PointF;
+import android.Manifest;
 import androidx.core.content.ContextCompat;
 import com.nixiedroid.bloomlwp.App;
-import android.Manifest;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.wallpapers.weather.AbstractSunriseUtil;
-import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
+
 public class SunriseUtil extends AbstractSunriseUtil {
 
     public SunriseUtil() {
@@ -25,7 +23,6 @@ public class SunriseUtil extends AbstractSunriseUtil {
         L.v("location: " + latitude + ", " + longitude);
         float[] sunriseSunsetTime = AbstractSunriseUtil.getSunriseSunset(latitude, longitude);
         L.v("sunrise/sunset: " + sunriseSunsetTime[0] + ", " + sunriseSunsetTime[1]);
-       // latLon = new PointF(latitude, longitude);
         sunriseDayPercent = sunriseSunsetTime[0];
         sunsetDayPercent = sunriseSunsetTime[1];
         TimeUtil.setSunriseSunsetPercents(sunriseSunsetTime[0], sunriseSunsetTime[1]);

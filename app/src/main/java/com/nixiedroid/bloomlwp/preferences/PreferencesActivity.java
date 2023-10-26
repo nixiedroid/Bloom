@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -55,6 +56,10 @@ public class PreferencesActivity extends AppCompatActivity {
         EditText apiKeyEditText = findViewById(R.id.APIEditText);
         String currentApiKey = cachePrefs.getString("API_KEY", getApplicationContext().getResources().getString(R.string.OWM_API_KEY));
         if (!currentApiKey.equals("0")) apiKeyEditText.setText(currentApiKey);
+        ((TextView) findViewById(R.id.weatherCondition))
+                .setText(cachePrefs.getString("current_weather_condition", "unknown"));
+        ((TextView) findViewById(R.id.weatherUpdateTime)).
+                setText(cachePrefs.getString("current_weather_update_time", "unknown"));
 
         findViewById(R.id.apiKeySetButton).setOnClickListener(v -> setApiKey(apiKeyEditText.getText()));
     }
