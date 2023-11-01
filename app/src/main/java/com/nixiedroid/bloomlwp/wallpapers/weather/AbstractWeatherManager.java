@@ -1,8 +1,6 @@
 package com.nixiedroid.bloomlwp.wallpapers.weather;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.ArraySet;
@@ -14,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public abstract class AbstractWeatherManager {
-    protected final SharedPreferences cachePrefs;
     protected boolean isStopped;
     protected Handler pollHandler;
     protected WeatherVo previousResult;
@@ -23,14 +20,13 @@ public abstract class AbstractWeatherManager {
 
     protected Runnable runnable;
 
-    public AbstractWeatherManager(Context context) {
+    public AbstractWeatherManager() {
         isStopped = false;
         runnable = AbstractWeatherManager.this::get;
         pollHandler = new Handler(Looper.getMainLooper());
-        cachePrefs = context.createDeviceProtectedStorageContext().getSharedPreferences("cache", 0);
         ArraySet<String> defaultResults = new ArraySet<>();
         defaultResults.add("1");
-        result = this.stringSetToWeather(cachePrefs.getStringSet("weather_condition", defaultResults));
+        result = this.stringSetToWeather(  App.preferences().getStringSet("weather_condition", defaultResults));
         resultTime = TimeUtil.nowMs();
         previousResult = this.result;
     }
@@ -76,7 +72,7 @@ public abstract class AbstractWeatherManager {
         pollHandler.removeCallbacks(runnable);
         pollHandler.postDelayed(runnable, intervalMs());
         if (result == Result.OKAY && weatherVo != null) {
-            this.cachePrefs.edit().putStringSet("weather_condition", this.weatherToStringSet(weatherVo)).apply();
+           App.preferences().edit().putStringSet("weather_condition", this.weatherToStringSet(weatherVo)).apply();
         }
     }
 

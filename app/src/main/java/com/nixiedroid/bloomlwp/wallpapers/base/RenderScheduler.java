@@ -41,7 +41,14 @@ public class RenderScheduler {
 //        this.scheduleNext(
 //                (int) ((float) this.renderer.frameInterval() * 16.666666f - (float) (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000.0f)
 //        );
-        this.scheduleNext((this.renderer.frameInterval() << 4) - (int)  (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000);
+        //this.scheduleNext((this.renderer.frameInterval() << 4) -
+        // (int)  (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000);
+        this.scheduleNext(
+                (int)(
+                        (float)this.renderer.frameInterval() * 16.666666f -
+                                (float)(SystemClock.elapsedRealtimeNanos() -
+                                        this.startNs) / 1000000.0f));
+
     }
 
     public void onDrawFrameStart() {

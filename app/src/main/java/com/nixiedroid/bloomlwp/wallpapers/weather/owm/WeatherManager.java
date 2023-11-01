@@ -17,7 +17,6 @@ import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
 public class WeatherManager extends AbstractWeatherManager {
 
     private static final int WEATHER_THROTTLE_MS = 30 * 60 * 1000;
-    protected long previousResultTime;
     private String API_KEY;
     private final BroadcastReceiver apiKeyUpdate = new BroadcastReceiver() {
         @Override
@@ -30,21 +29,20 @@ public class WeatherManager extends AbstractWeatherManager {
     private OWMWeatherCode weather = null;
 
     public WeatherManager(Context context) {
-        super(context);
+        super();
         IntentFilter intentFilter = new IntentFilter("preferences_api_key_update");
         LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.apiKeyUpdate, intentFilter);
-        API_KEY = cachePrefs.getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
+        API_KEY = App.preferences().getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
         if (API_KEY.equals("0")) {
             L.w("API KEy not set");
             //return;
         }
         L.v("Using API Key: " + API_KEY);
-        previousResultTime = cachePrefs.getLong("prevUpdateTime", 0L);
     }
 
     private void getWeather(double lat, double lon) {
         try {
-            OWMWeatherCode code =  HttpUrlConnector.getWeatherCode(API_KEY, lat, lon);
+            OWMWeatherCode code = HttpUrlConnector.getWeatherCode(API_KEY, lat, lon);
             L.v("Got weather " + code.getDescription());
 
             weather = code;
@@ -61,8 +59,7 @@ public class WeatherManager extends AbstractWeatherManager {
             this.afterResult(Result.FAILED_NO_PERMISSION);
             return;
         }
-        previousResultTime = cachePrefs.getLong("prevUpdateTime", 0L);
-        long tempTime = TimeUtil.elapsedRealTimeSince(previousResultTime);
+        long tempTime = TimeUtil.elapsedRealTimeSince(App.preferences().getLong("prevUpdateTime", 0L));
         if (tempTime < WEATHER_THROTTLE_MS) {
             L.d("Weather Throttling");
             this.afterResult(Result.STOPPED);
@@ -76,10 +73,10 @@ public class WeatherManager extends AbstractWeatherManager {
                 result = weather.getWeatherVo();
                 this.previousResult = result;
                 this.resultTime = TimeUtil.nowMs();
-                this.previousResultTime = resultTime;
-                this.cachePrefs.edit().putLong("prevUpdateTime", previousResultTime).apply();
-                cachePrefs.edit().putString("current_weather_condition", weather.getDescription()).apply();
-                cachePrefs.edit().putString("current_weather_update_time", Util.epochToString(previousResultTime)).apply();
+                App.preferences().edit().putLong("prevUpdateTime", resultTime).apply();
+                App.preferences().edit().putString("current_location", latitude + " " + longitude).apply();
+                App.preferences().edit().putString("current_weather_condition", weather.getDescription()).apply();
+                App.preferences().edit().putString("current_weather_update_time", Util.epochToString(resultTime)).apply();
                 L.v("successful result: " + result.toString());
                 afterResult(Result.OKAY, result);
             } else {
@@ -90,7 +87,6 @@ public class WeatherManager extends AbstractWeatherManager {
             this.afterResult(Result.FAILED_NO_PERMISSION);
         }
     }
-
 
 
     @Override

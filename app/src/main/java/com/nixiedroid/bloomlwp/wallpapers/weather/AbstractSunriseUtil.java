@@ -8,7 +8,6 @@ import com.nixiedroid.bloomlwp.util.L;
 import java.util.Date;
 
 public abstract class AbstractSunriseUtil {
-   // protected PointF latLon;
     protected float sunriseDayPercent;
     protected float sunsetDayPercent;
 
@@ -21,24 +20,18 @@ public abstract class AbstractSunriseUtil {
         return new float[]{TimeUtil.epochMsToDayPercent(sunRise), TimeUtil.epochMsToDayPercent(sunSet)};
     }
 
-    protected void afterResult(Result result) {
+    protected void afterResult() {
         Intent intent = new Intent("sunrise_result");
-        intent.putExtra("sunrise_result", result == Result.OKAY);
+        intent.putExtra("sunrise_result", true);
         LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
     }
 
     protected abstract void doGet();
 
     public void get() {
+        L.v("Getting location");
         this.doGet();
     }
 
-    public enum Result {
-        OKAY,
-        FAILED,
-        FAILED_NO_PERMISSION,
-        STOPPED
-
-    }
 }
 

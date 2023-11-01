@@ -1,10 +1,17 @@
 package com.nixiedroid.bloomlwp.util;
 
 import android.util.Log;
+import com.nixiedroid.bloomlwp.BuildConfig;
 
 public class L {
     public static boolean decorationEnabled = true;
-    public static int levelFilter;
+    public static int levelFilter = 0;
+
+    public L() {
+        if (!BuildConfig.DEBUG) {
+            levelFilter = 3;
+        }
+    }
 
     public static void d() {
         if (levelFilter <= 1) {
