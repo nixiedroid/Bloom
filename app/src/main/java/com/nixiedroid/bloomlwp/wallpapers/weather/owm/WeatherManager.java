@@ -27,6 +27,9 @@ public class WeatherManager extends AbstractWeatherManager {
         }
     };
     private OWMWeatherCode weather = null;
+    public static void updateWeatherNow(){
+       App.preferences().edit().putLong("prevUpdateTime", 0).apply();
+    }
 
     public WeatherManager(Context context) {
         super();

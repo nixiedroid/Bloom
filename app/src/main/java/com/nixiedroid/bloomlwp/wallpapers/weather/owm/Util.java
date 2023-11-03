@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -44,6 +43,7 @@ public class Util {
             throw new RuntimeException("Couldn't create constant for " + url, ex);
         }
     }
+
     public static String toString(final InputStream input, final Charset encoding) throws IOException {
         final StringBuilder output = new StringBuilder();
         final InputStreamReader in = new InputStreamReader(input, encoding);
@@ -70,4 +70,8 @@ public class Util {
             // ignore
         }
     }
+
+
+
+
 }

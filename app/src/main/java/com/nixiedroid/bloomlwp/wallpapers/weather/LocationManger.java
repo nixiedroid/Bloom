@@ -1,12 +1,15 @@
 package com.nixiedroid.bloomlwp.wallpapers.weather;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
+
+import java.util.List;
 
 import static android.content.Context.LOCATION_SERVICE;
 
@@ -18,52 +21,42 @@ public class LocationManger {
 
     private LocationManger() {
         locationManager = (LocationManager) App.get().getSystemService(LOCATION_SERVICE);
-        getLocation();
+        updateLocation();
     }
 
     public static LocationManger get() {
         return instance;
     }
 
-    private void getLocation() {
+    private void updateLocation() {
 
-        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != 0) {
+        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
             L.w("no permissions");
             return;
         }
-
-        L.d(locationManager.getProviders(true).toString());
-        Location location = null;
-
-        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
-            location = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        List<String> providers = locationManager.getProviders(true);
+        Location location;
+        for (String provider : providers) {
+            location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                L.v("LocationManger: lat=" + location.getLatitude() + " lon=" + location.getLongitude());
+                lastKnownLocation.setLon(location.getLongitude());
+                lastKnownLocation.setLat(location.getLatitude());
+            }
         }
-        if (location == null) {
-            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }
-        if (location == null) {
-            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }
-        if (location != null) {
-            L.v("LocationManger: lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-            lastKnownLocation.setLon(location.getLongitude());
-            lastKnownLocation.setLat(location.getLatitude());
-        } else {
-//            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-//                getActiveLocation(LocationManager.NETWORK_PROVIDER);
-//            } else getActiveLocation(LocationManager.GPS_PROVIDER);
-        }
+            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                getActiveLocation(LocationManager.NETWORK_PROVIDER);
+            } else getActiveLocation(LocationManager.GPS_PROVIDER);
         L.d("Location is null. Probably, disabled");
 
     }
+    @SuppressLint({"deprecated", "MissingPermission"})
     private void getActiveLocation(String provider){
-        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_FINE_LOCATION) == 0) {
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
                 locationManager.getCurrentLocation(LocationManager.NETWORK_PROVIDER,
                         null, null, null);
             }
             locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, null, null);
-        }
     }
 
     public Coord getCoord() {
@@ -72,8 +65,7 @@ public class LocationManger {
             L.v("LocationManger: lat=" + lastKnownLocation.getLat() + " lon=" + lastKnownLocation.getLon());
             return lastKnownLocation;
         }
-        ;
-        getLocation();
+        updateLocation();
         return lastKnownLocation;
     }
 }
