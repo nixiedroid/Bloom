@@ -35,7 +35,28 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    }
+
+tasks.register("startCmdline",Exec) {
+    group = 'Start'
+    commandLine 'adb', 'shell', "am start " +
+            "-S -a android.service.wallpaper.CHANGE_LIVE_WALLPAPER " +
+            "--ecn android.service.wallpaper.extra.LIVE_WALLPAPER_COMPONENT " +
+            "com.nixiedroid.bloomlwp/.wallpapers.bloom.BloomWallpaperService"
 }
+
+tasks.register("startDebug") {
+    dependsOn 'installDebug'
+    group = 'Start'
+    finalizedBy startCmdline
+}
+tasks.register("startRelease") {
+    dependsOn 'installRelease'
+    group = 'Start'
+    finalizedBy startCmdline
+}
+
+
 
 dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
