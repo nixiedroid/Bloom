@@ -1,7 +1,7 @@
 package com.nixiedroid.bloomlwp.util.gl;
 
 import android.content.Context;
-import com.nixiedroid.bloomlwp.wallpapers.base.RenderNode;
+import com.nixiedroid.bloomlwp.wallpaper.base.RenderNode;
 
 public abstract class ShaderProgram
 extends RenderNode {

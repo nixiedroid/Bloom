@@ -1,17 +1,21 @@
 package com.nixiedroid.bloomlwp.preferences;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.wallpapers.weather.owm.ApiKey;
-import com.nixiedroid.bloomlwp.wallpapers.weather.owm.WeatherManager;
+import com.nixiedroid.bloomlwp.weather.owm.ApiKey;
+import com.nixiedroid.bloomlwp.weather.owm.WeatherManager;
 import org.jetbrains.annotations.NotNull;
 
 public class PreferencesActivity extends AppCompatActivity {
@@ -53,9 +57,20 @@ public class PreferencesActivity extends AppCompatActivity {
         super.onDestroy();
         L.d();
     }
+    private boolean verifyGoogleAPIAvailability(){
+        return GoogleApiAvailability.getInstance().
+                isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS;
+    }
 
     private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        if (verifyGoogleAPIAvailability()) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_CODE);
+
+        } else {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        }
     }
 
 
@@ -63,7 +78,7 @@ public class PreferencesActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int responseCode, @NotNull final String[] permissions, @NotNull final int[] grantResults) {
         L.d();
         if (responseCode == REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == 0) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 L.v("fine location granted");
             } else {
                 L.v("fine location denied");

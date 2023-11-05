@@ -3,8 +3,8 @@ package com.nixiedroid.bloomlwp;
 import android.app.Application;
 import android.content.SharedPreferences;
 import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.wallpapers.bloom.BloomTestSettings;
-import com.nixiedroid.bloomlwp.wallpapers.weather.TimeUtil;
+import com.nixiedroid.bloomlwp.wallpaper.bloom.BloomTestSettings;
+import com.nixiedroid.bloomlwp.weather.TimeUtil;
 
 public class App
 extends Application {
@@ -22,6 +22,9 @@ extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        if (!BuildConfig.DEBUG) {
+            android.os.Debug.waitForDebugger();
+        }
         instance = this;
         preferences = createDeviceProtectedStorageContext().getSharedPreferences("cache", 0);
         L.d("\n----------------------------------------------------------------------------------");
