@@ -3,7 +3,19 @@ package com.nixiedroid.bloomlwp.weather;
 import org.jetbrains.annotations.NotNull;
 
 public class WeatherVo {
-    private static final String[] conditionStrings = new String[]{"UNKNOWN", "CLEAR", "CLOUDY", "FOGGY", "HAZY", "ICY", "RAINY", "SNOWY", "STORMY", "WINDY"};
+    private static final String[] conditionStrings =
+            new String[]{
+                    "UNKNOWN",
+                    "CLEAR",
+                    "CLOUDY",
+                    "FOGGY",
+                    "HAZY",
+                    "ICY",
+                    "RAINY",
+                    "SNOWY",
+                    "STORMY",
+                    "WINDY"
+    };
     public int[] conditions;
 
     public static String conditionString(int n) {

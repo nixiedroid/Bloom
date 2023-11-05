@@ -1,18 +1,23 @@
 package com.nixiedroid.bloomlwp.weather;
 
-import android.Manifest;
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
+import android.os.Looper;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.PermissionChecker;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.List;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.google.android.gms.common.ConnectionResult.SUCCESS;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class LocationManger {
     private static final LocationManger instance = new LocationManger();
@@ -20,72 +25,75 @@ public class LocationManger {
     protected long previousResultTime;
     LocationManager locationManager;
     FusedLocationProviderClient fusedLocationClient;
-    private static boolean isGoogleAvailable = true;
+    private boolean isGoogleAvailable;
 
     private LocationManger() {
-
         try {
-            Method m = LocationServices.class.getDeclaredMethod("getFusedLocationProviderClient", Context.class);
-            fusedLocationClient = (FusedLocationProviderClient) m.invoke(null,App.get());
-        } catch (NoSuchMethodException e) {
+            int checkResult = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(App.get());
+            isGoogleAvailable = (checkResult == SUCCESS);
+        } catch (NoClassDefFoundError e) {
             isGoogleAvailable = false;
-            locationManager = (LocationManager) App.get().getSystemService(LOCATION_SERVICE);
-        } catch (InvocationTargetException | IllegalAccessException e) {
-            throw new RuntimeException(e);
         }
-        updateLocationGoogle();
+        if (isGoogleAvailable) {
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(App.get());
+        } else {
+            locationManager = (LocationManager) App.get().getSystemService(LOCATION_SERVICE);
+        }
+        updateLocation();
     }
 
     public static LocationManger get() {
         return instance;
     }
 
-//    private void updateLocationNonGoogle() {
-//        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_FINE_LOCATION) != 0) {
-//            L.w("no permissions");
-//            return;
-//        }
-//        List<String> providers = locationManager.getProviders(true);
-//        Location location;
-//        for (String provider : providers) {
-//            location = locationManager.getLastKnownLocation(provider);
-//            if (location != null) {
-//                L.v("LocationManger: lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-//                lastKnownLocation.setLon(location.getLongitude());
-//                lastKnownLocation.setLat(location.getLatitude());
-//            }
-//        }
-//            if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-//                getActiveLocation(LocationManager.NETWORK_PROVIDER);
-//            } else getActiveLocation(LocationManager.GPS_PROVIDER);
-//        L.d("Location is null. Probably, disabled");
-//
-//    }
-//    @SuppressLint({"deprecated", "MissingPermission"})
-//    private void getActiveLocation(String provider){
-//            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-//                locationManager.getCurrentLocation(LocationManager.NETWORK_PROVIDER,
-//                        null, null, null);
-//            }
-//            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, null, null);
-//    }
-    private void updateLocationGoogle(){
-        if (!isGoogleAvailable) return;
-        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != 0) {
-            L.w("no permissions");
+    private void updateLocation() {
+        if (!(ContextCompat.checkSelfPermission(App.get(),ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED)) {
             return;
         }
+        if (isGoogleAvailable) {
+            updateLocationGoogle();
+        } else {
+            updateLocationNonGoogle();
+        }
+    }
 
-        fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-            if (location != null) {
-                L.v("LocationManger: lat=" + location.getLatitude() + " lon=" + location.getLongitude());
-                lastKnownLocation.setLon(location.getLongitude());
-                lastKnownLocation.setLat(location.getLatitude());
-                previousResultTime = System.currentTimeMillis();
+    @SuppressLint("MissingPermission")
+    private void updateLocationNonGoogle() {
+        if (locationManager != null) {
+            List<String> providers = locationManager.getProviders(true);
+            for (String provider : providers) {
+                setLastKnownLocation(locationManager.getLastKnownLocation(provider));
             }
-           // L.v(fusedLocationClient.getLocationAvailability().toString());
-           // fusedLocationClient.getCurrentLocation(new);
-        });
+            getActiveLocation(LocationManager.NETWORK_PROVIDER);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("MissingPermission")
+    private void getActiveLocation(String provider) {
+        if (locationManager.isProviderEnabled(provider)) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
+                L.v("Using legacy code, as newer not implemented");
+            }
+            locationManager.requestSingleUpdate(provider, this::setLastKnownLocation, Looper.getMainLooper());
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void updateLocationGoogle() {
+        if (fusedLocationClient != null) {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(this::setLastKnownLocation);
+        }
+    }
+
+    private void setLastKnownLocation(Location l) {
+        if (l != null) {
+            L.v("LocationManger: lat=" + l.getLatitude() + " lon=" + l.getLongitude());
+            lastKnownLocation.setLon(l.getLongitude());
+            lastKnownLocation.setLat(l.getLatitude());
+            previousResultTime = System.currentTimeMillis();
+        }
+        L.d("Location is null. Probably, disabled");
     }
 
     public Coord getCoord() {
@@ -94,7 +102,7 @@ public class LocationManger {
             L.v("LocationManger: lat=" + lastKnownLocation.getLat() + " lon=" + lastKnownLocation.getLon());
             return lastKnownLocation;
         }
-        updateLocationGoogle();
+        updateLocation();
         return lastKnownLocation;
     }
 }

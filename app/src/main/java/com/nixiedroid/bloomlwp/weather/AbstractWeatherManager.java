@@ -42,7 +42,7 @@ public abstract class AbstractWeatherManager {
         }
 
         WeatherVo weatherVo = new WeatherVo();
-        if (resultInteger.size() != 0) {
+        if (!resultInteger.isEmpty()) {
             weatherVo.conditions = new int[resultInteger.size()];
             for (int i = 0; i < resultInteger.size(); i++) {
                 weatherVo.conditions[i] = resultInteger.get(i);
@@ -114,7 +114,7 @@ public abstract class AbstractWeatherManager {
         OKAY,
         FAILED,
         FAILED_NO_PERMISSION,
-        STOPPED;
+        STOPPED
 
     }
 }

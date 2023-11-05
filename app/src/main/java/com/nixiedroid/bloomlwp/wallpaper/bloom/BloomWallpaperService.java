@@ -1,5 +1,6 @@
 package com.nixiedroid.bloomlwp.wallpaper.bloom;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +14,6 @@ import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
 import com.nixiedroid.bloomlwp.wallpaper.base.WallpaperService;
 import com.nixiedroid.bloomlwp.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.weather.owm.WeatherManager;
-import android.Manifest;
 
 public class BloomWallpaperService
 extends WallpaperService {
@@ -64,6 +64,7 @@ extends WallpaperService {
 
     @Override
     public void onCreate() {
+
         super.onCreate();
         L.d();
         instance = this;

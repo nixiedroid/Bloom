@@ -20,7 +20,10 @@ public class HttpUrlConnector {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("Content-length", "0");
             connection.setUseCaches(false);
+            connection.setAllowUserInteraction(false);
             return connection;
         } catch (IOException ignored) {
             throw new OWMConnectorException(ErrorResult.INTERNAL_INVALID_URL);
@@ -29,17 +32,14 @@ public class HttpUrlConnector {
 
     public static OWMWeatherCode getWeatherCode(String APIKey, double lat, double lon) throws OWMConnectorException {
         ExecutorService exec = Executors.newSingleThreadExecutor();
-        Future<OWMWeatherCode> cod = exec.submit(new Callable<OWMWeatherCode>() {
-            @Override
-            public OWMWeatherCode call() throws OWMConnectorException {
-                //lat={lat}&lon={lon}&appid={API key}
-                URL url = Util.concatenateURL(API_URL, "lat=" + lat);
-                url = Util.concatenateURL(url, "lon=" + lon);
-                url = Util.concatenateURL(url, "appid=" + APIKey);
-                HttpURLConnection connection =  createUrlConnection(url);
-                int weatherId = Util.getWeatherIdFromJson(readInputStream(connection));
-                return new OWMWeatherCode(weatherId);
-            }
+        Future<OWMWeatherCode> cod = exec.submit(() -> {
+            //lat={lat}&lon={lon}&appid={API key}
+            URL url = Util.concatenateURL(API_URL, "lat=" + lat);
+            url = Util.concatenateURL(url, "lon=" + lon);
+            url = Util.concatenateURL(url, "appid=" + APIKey);
+            HttpURLConnection connection =  createUrlConnection(url);
+            int weatherId = Util.getWeatherIdFromJson(readInputStream(connection));
+            return new OWMWeatherCode(weatherId);
         });
         OWMWeatherCode responseCode;
         try {

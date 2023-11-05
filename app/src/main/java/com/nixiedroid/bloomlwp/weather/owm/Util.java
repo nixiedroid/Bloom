@@ -2,6 +2,7 @@ package com.nixiedroid.bloomlwp.weather.owm;
 
 import android.text.format.DateFormat;
 import com.nixiedroid.bloomlwp.weather.owm.enums.ErrorResult;
+import org.json.JSONObject;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,30 +13,30 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Util {
-    private static final Pattern pattern = Pattern.compile("\"id\" *: *([0-9]{3}),");
+
     public static int getWeatherIdFromJson(String json) throws OWMConnectorException {
-        Matcher matcher = pattern.matcher(json);
-        if (matcher.find()){
-            String weatherCode = matcher.group(matcher.groupCount());
-            if (weatherCode == null) throw new OWMConnectorException(ErrorResult.INTERNAL_FAILED_TO_PARSE_JSON_NULL);
-            return Integer.parseInt(weatherCode);
-        } else throw new OWMConnectorException(ErrorResult.INTERNAL_FAILED_TO_PARSE_JSON);
+        try {
+            JSONObject object = new JSONObject(json).getJSONArray("weather").getJSONObject(0);
+            return object.getInt("id");
+        } catch (Exception e) {
+            throw new OWMConnectorException(ErrorResult.INTERNAL_FAILED_TO_PARSE_JSON);
+        }
     }
+
     public static URL concatenateURL(URL url, String query) {
         try {
             if (url.getQuery() == null)
                 return new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "?" + query);
-            if (url.getQuery().length() == 0)
+            if (url.getQuery().isEmpty())
                 return new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "?" + query);
             return new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile() + "&" + query);
         } catch (MalformedURLException ex) {
             throw new IllegalArgumentException("Could not concatenate given URL with GET arguments!", ex);
         }
     }
+
     public static URL constantURL(String url) {
         try {
             return new URL(url);
@@ -55,7 +56,7 @@ public class Util {
         return output.toString();
     }
 
-    public static String epochToString(long epochMs){
+    public static String epochToString(long epochMs) {
         Calendar cal = Calendar.getInstance(Locale.ENGLISH);
         cal.setTimeInMillis(epochMs);
         return DateFormat.format("dd-MM-yyyy  hh:mm", cal).toString();
@@ -70,8 +71,6 @@ public class Util {
             // ignore
         }
     }
-
-
 
 
 }
