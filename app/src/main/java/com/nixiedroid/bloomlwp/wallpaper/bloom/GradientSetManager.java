@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GradientSetManager {
-    public List<GradientSet> gradientSets;
     private final Gradient scratch1 = new Gradient();
     private final Gradient scratch2 = new Gradient();
+    public List<GradientSet> gradientSets;
 
     public GradientSetManager() {
         GradientSet gradientSet = new GradientSet(new Gradient("#F8C66F", "#CE93D8", "#0F284C", "#455A64", "#212121"), new Gradient("#CE93D8", "#F48FB1", "#2B1780", "#0D47A1", "#0A3880"), new Gradient("#8EF6D6", "#FFF59D", "#1A1885", "#9575CD", "#006BC3"), new Gradient("#4fadf6", "#93c7fa", "#303f9f", "#52b6b3", "#1a3da3"), new Gradient("#FFAB91", "#CE93D8", "#311B92", "#1976D2", "#1A237E"), new Gradient("#DC5A7A", "#9739B2", "#311B92", "#6A189A", "#311B92"));
@@ -50,46 +50,19 @@ public class GradientSetManager {
         return f * 0.4f;
     }
 
-    public void calcGradientByConditionAndTimeIndexWithOscillation(int n, int n2, boolean bl, Gradient gradient) {
-        int n3;
-        float f = GradientSetManager.oscillationOffset();
-        if (bl) {
-            f = 0.0f;
-        }
-        int n4 = 5;
-        if (f >= 0.0f) {
-            int n5;
-            n3 = n5 = n2 + 1;
-            if (n5 > 5) {
-                n3 = 0;
-            }
-        } else {
-            int n6;
-            n3 = n6 = n2 - 1;
-            if (n6 < 0) {
-                n3 = n4;
-            }
-        }
-        Gradient.lerp(this.gradientByConditionAndTimeIndex(n, n2), this.gradientByConditionAndTimeIndex(n, n3), Math.abs(f), gradient);
-    }
-
-    public Gradient gradientByConditionAndTimeIndex(int n, int n2) {
-        return this.gradientSets.get(n).list().get(n2);
-    }
-
     public GradientSet gradientSetByCondition(int n) {
         return this.gradientSets.get(n);
     }
 
-    public void lerpUsingDayPercent(int n, int n2, float f, float f2, boolean bl, Gradient gradient) {
-        this.gradientSetByCondition(n).lerpUsingDayPercent(f2, bl, this.scratch1);
-        this.gradientSetByCondition(n2).lerpUsingDayPercent(f2, bl, this.scratch2);
+    public void lerpUsingDayPercent(int n, int n2, float f, float f2, Gradient gradient) {
+        this.gradientSetByCondition(n).lerpUsingDayPercent(f2, this.scratch1);
+        this.gradientSetByCondition(n2).lerpUsingDayPercent(f2, this.scratch2);
         Gradient.lerp(this.scratch1, this.scratch2, f, gradient);
     }
 
-    public void lerpUsingSlidingIndex(int n, int n2, float f, float f2, boolean bl, Gradient gradient) {
-        this.gradientSetByCondition(n).lerpUsingSlidingIndex(f2, bl, this.scratch1);
-        this.gradientSetByCondition(n2).lerpUsingSlidingIndex(f2, bl, this.scratch2);
+    public void lerpUsingSlidingIndex(int n, int n2, float f, float f2, Gradient gradient) {
+        this.gradientSetByCondition(n).lerpUsingSlidingIndex(f2,  this.scratch1);
+        this.gradientSetByCondition(n2).lerpUsingSlidingIndex(f2,  this.scratch2);
         Gradient.lerp(this.scratch1, this.scratch2, f, gradient);
     }
 

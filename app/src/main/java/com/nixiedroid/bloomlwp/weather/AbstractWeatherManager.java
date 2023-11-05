@@ -1,12 +1,12 @@
 package com.nixiedroid.bloomlwp.weather;
 
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.ArraySet;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
+import com.nixiedroid.bloomlwp.events.WeatherResult;
 import com.nixiedroid.bloomlwp.util.L;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -66,9 +66,7 @@ public abstract class AbstractWeatherManager {
     }
 
     protected void afterResult(Result result, WeatherVo weatherVo) {
-        Intent intent = new Intent("weather_result");
-        intent.putExtra("weather_result", result == Result.OKAY);
-        LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
+        EventBus.getDefault().post(new WeatherResult(result == Result.OKAY));
         pollHandler.removeCallbacks(runnable);
         pollHandler.postDelayed(runnable, intervalMs());
         if (result == Result.OKAY && weatherVo != null) {

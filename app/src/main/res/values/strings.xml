@@ -11,4 +11,6 @@
     <string name="button_set_api_key">Set API KEY</string>
     <string name="button_update_weather">Update weather conditions now</string>
     <string name="api_key_apply_success">api key apply success</string>
+    <string name="no_permission_warning">No location permission granted.
+        Please, grant it in settings</string>
 </resources>

@@ -9,6 +9,7 @@ public class RenderScheduler {
     private Renderer renderer;
     private long startNs;
     private boolean visible = true;
+
     @SuppressWarnings("deprecation")
     public RenderScheduler(Renderer renderer) {
         runnable = () -> RenderScheduler.this.renderer.glSurfaceView().requestRender();
@@ -38,16 +39,8 @@ public class RenderScheduler {
         if (!this.visible) {
             return;
         }
-//        this.scheduleNext(
-//                (int) ((float) this.renderer.frameInterval() * 16.666666f - (float) (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000.0f)
-//        );
-        //this.scheduleNext((this.renderer.frameInterval() << 4) -
-        // (int)  (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000);
-        this.scheduleNext(
-                (int)(
-                        (float)this.renderer.frameInterval() * 16.666666f -
-                                (float)(SystemClock.elapsedRealtimeNanos() -
-                                        this.startNs) / 1000000.0f));
+
+        this.scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f - (float) (SystemClock.elapsedRealtimeNanos() - this.startNs) / 1000000.0f));
 
     }
 

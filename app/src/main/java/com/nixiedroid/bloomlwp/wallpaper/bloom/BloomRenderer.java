@@ -1,88 +1,73 @@
 package com.nixiedroid.bloomlwp.wallpaper.bloom;
 
 import android.app.WallpaperColors;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.view.animation.PathInterpolator;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import com.nixiedroid.bloomlwp.App;
-import com.nixiedroid.bloomlwp.util.AnimFloat;
-import com.nixiedroid.bloomlwp.util.ColUtil;
-import com.nixiedroid.bloomlwp.util.L;
-import com.nixiedroid.bloomlwp.util.MathUtil;
-import com.nixiedroid.bloomlwp.util.Terps;
+import com.nixiedroid.bloomlwp.events.SunriseResult;
+import com.nixiedroid.bloomlwp.events.WeatherResult;
+import com.nixiedroid.bloomlwp.util.*;
 import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
+import com.nixiedroid.bloomlwp.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
 import com.nixiedroid.bloomlwp.weather.WeatherVo;
-import com.nixiedroid.bloomlwp.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.weather.owm.WeatherManager;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public class BloomRenderer
-extends Renderer {
+        extends Renderer {
     private static final int[] weatherConditionByPriority = new int[]{8, 6, 7, 2, 3, 4, 5, 9, 1, 0};
     private final Gradient gradient;
     private final GradientSetManager gradientMan;
-    private boolean isOscillationDisabled;
     private final Gradient lastGradient;
-    private int lastWeatherCondition;
-    private BloomProgram program;
-    private final Gradient scratch1 = new Gradient();
-    private final Gradient scratch2 = new Gradient();
     private final int startSlidingIndex;
     private final long startTime;
-    private final BroadcastReceiver sunriseReceiver = new BroadcastReceiver(){
-        @Override
-        public void onReceive(Context object, Intent intent) {
-            final boolean booleanExtra = intent.getBooleanExtra("sunrise_result", false);
-            L.v("got sunrise broadcast - " +booleanExtra);
-            BloomRenderer.this.gradientMan.updateAllRanges();
-        }
-    };
+    private int lastWeatherCondition;
+    private BloomProgram program;
     private AnimFloat unlockBottomFadeInAnim;
     private AnimFloat unlockBottomFadeoutAnim;
     private AnimFloat unlockBottomSlideAnim;
     private AnimFloat unlockTopFadeInAnim;
     private AnimFloat unlockTopFadeoutAnim;
     private AnimFloat unlockTopSlideAnim;
-    private final BroadcastReceiver weatherBroadcastReceiver = new BroadcastReceiver(){
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getBooleanExtra("weather_result", false)) {
-                BloomRenderer.this.updateWeatherCondition();
-            }
-        }
-    };
     private int weatherCondition;
     private float weatherTransitionPercent;
 
     public BloomRenderer() {
-        if (App.get().bloomTestSettings != null) {
-            if (App.get().bloomTestSettings.shouldDisableOscillation) {
-                this.isOscillationDisabled = true;
-            }
-        }
+        EventBus.getDefault().register(this);
         this.updateWeatherCondition();
         this.lastWeatherCondition = this.weatherCondition;
         this.gradient = new Gradient();
         this.lastGradient = new Gradient();
         this.gradientMan = new GradientSetManager();
         this.initUnlockAnims();
-        IntentFilter intentFilter = new IntentFilter("sunrise_result");
-        LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.sunriseReceiver, intentFilter);
-
-        intentFilter = new IntentFilter("weather_result");
-        LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.weatherBroadcastReceiver, intentFilter);
-
         this.startTime = System.currentTimeMillis();
-        this.startSlidingIndex = (int)gradientMan.gradientSetByCondition(this.weatherCondition).calcSlidingIndex(TimeUtil.nowDayPercent());
+        this.startSlidingIndex = (int) gradientMan.gradientSetByCondition(this.weatherCondition).calcSlidingIndex(TimeUtil.nowDayPercent());
+    }
+
+    /**
+     * @noinspection unused
+     */
+    @Subscribe
+    public void weatherReceiver(WeatherResult event) {
+        L.v("got weather broadcast - ");
+        if (event.isOkay()) {
+            BloomRenderer.this.updateWeatherCondition();
+        }
+    }
+
+    /**
+     * @noinspection unused
+     */
+    @Subscribe
+    public void sunriseReceiver(SunriseResult event) {
+        L.v("got sunrise broadcast - ");
+        BloomRenderer.this.gradientMan.updateAllRanges();
     }
 
     private void initUnlockAnims() {
@@ -108,9 +93,9 @@ extends Renderer {
         this.weatherTransitionPercent = MathUtil.normalize(elapsedTimeSinceLastWeatherUpdate, 0.0f, 3000.0f, true);
         float dayPercent = TimeUtil.nowDayPercent();
         if (this.weatherTransitionPercent < 1.0f) {
-            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, this.weatherTransitionPercent, dayPercent, !isOscillationDisabled, gradient);
+            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, this.weatherTransitionPercent, dayPercent,  gradient);
         } else {
-            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(dayPercent, !isOscillationDisabled, gradient);
+            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(dayPercent,  gradient);
             if (this.weatherTransitionPercent != prevWTP) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     this.engine.notifyColorsChanged();
@@ -119,39 +104,19 @@ extends Renderer {
         }
     }
 
-    private void updateGradientDebugMode() {
-        Gradient.copyFromTo(this.gradient, this.lastGradient);
-        this.weatherTransitionPercent = MathUtil.map(System.currentTimeMillis() - this.surfaceChangeTime, 2000.0f, 5000.0f, 0.0f, 1.0f, true);
-        BloomTestSettings bloomTestSettings = App.get().bloomTestSettings;
-        if (bloomTestSettings.timeIndex2 <= -1 && bloomTestSettings.weather2 <= -1) {
-            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.gradient);
-        } else {
-            this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch1);
-            int n = bloomTestSettings.timeIndex2;
-            if (n > -1) {
-                this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(bloomTestSettings.weather1, n, this.isOscillationDisabled, this.scratch2);
-            } else {
-                n = bloomTestSettings.weather2;
-                if (n > -1) {
-                    this.gradientMan.calcGradientByConditionAndTimeIndexWithOscillation(n, bloomTestSettings.timeIndex1, this.isOscillationDisabled, this.scratch2);
-                }
-            }
-            Gradient.lerp(this.scratch1, this.scratch2, this.weatherTransitionPercent, this.gradient);
-        }
-    }
 
     private void updateGradientPreviewMode() {
         Gradient.copyFromTo(this.gradient, this.lastGradient);
         this.weatherTransitionPercent = MathUtil.normalize(TimeUtil.elapsedRealTimeSince(BloomWallpaperService.get().weatherMan().resultTime()), 0.0f, 3000.0f, true);
-        float f = (float)(System.currentTimeMillis() - this.startTime) / 1000.0f / 30.0f % 1.0f / 0.16666667f;
-        int n = (int)Math.floor(f);
+        float f = (float) (System.currentTimeMillis() - this.startTime) / 1000.0f / 30.0f % 1.0f / 0.16666667f;
+        int n = (int) Math.floor(f);
         f = MathUtil.map(f % 1.0f, 0.166f, 0.833f, 0.0f, 1.0f, true);
-        f = ((float)(n % 6) + f + (float)this.startSlidingIndex) % 6.0f;
+        f = ((float) (n % 6) + f + (float) this.startSlidingIndex) % 6.0f;
         float f2 = this.weatherTransitionPercent;
         if (f2 < 1.0f) {
-            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f, !this.isOscillationDisabled, this.gradient);
+            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f,  this.gradient);
         } else {
-            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingSlidingIndex(f, !this.isOscillationDisabled, this.gradient);
+            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingSlidingIndex(f, this.gradient);
         }
     }
 
@@ -189,8 +154,8 @@ extends Renderer {
             height = this.viewportHeight;
             width = 0;
         } else {
-            width = (int)((float)this.viewportHeight * 0.2f);
-            height = (int)((float)this.viewportHeight * 0.55f);
+            width = (int) ((float) this.viewportHeight * 0.2f);
+            height = (int) ((float) this.viewportHeight * 0.55f);
         }
         GLES20.glClearColor(this.gradient().middle[0], this.gradient().middle[1], this.gradient().middle[2], 1.0f);
         GLES20.glEnable(3089);
@@ -202,9 +167,7 @@ extends Renderer {
 
     @Override
     protected void doUpdate() {
-        if (App.get().bloomTestSettings != null && App.get().bloomTestSettings.useCustomWeather) {
-            this.updateGradientDebugMode();
-        } else if (this.isPreview) {
+        if (this.isPreview) {
             this.updateGradientPreviewMode();
         } else {
             this.updateGradient();
@@ -242,14 +205,13 @@ extends Renderer {
                         Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)));
             }
         }
-       return null;
+        return null;
     }
 
     @Override
     public void onDestroy() {
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
-        LocalBroadcastManager.getInstance(App.get()).unregisterReceiver(this.sunriseReceiver);
-        LocalBroadcastManager.getInstance(App.get()).unregisterReceiver(this.weatherBroadcastReceiver);
     }
 
     @Override

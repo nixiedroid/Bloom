@@ -1,36 +1,64 @@
 package com.nixiedroid.bloomlwp.preferences;
 
 import android.Manifest;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.R;
+import com.nixiedroid.bloomlwp.events.ApiKeyUpdate;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.owm.ApiKey;
 import com.nixiedroid.bloomlwp.weather.owm.WeatherManager;
+import org.greenrobot.eventbus.EventBus;
 
 public class PreferencesActivity extends AppCompatActivity {
 
+
+    ActivityResultLauncher<String[]> locationPermissionRequest =
+            registerForActivityResult(new ActivityResultContracts
+                            .RequestMultiplePermissions(), result -> {
+                        Boolean fineLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_FINE_LOCATION, false);
+                        Boolean coarseLocationGranted = result.getOrDefault(
+                                Manifest.permission.ACCESS_COARSE_LOCATION, false);
+                        if (fineLocationGranted != null && fineLocationGranted) {
+                            L.v("fine location granted");
+                        } else if (coarseLocationGranted != null && coarseLocationGranted) {
+                            L.v("coarse location granted");
+                        } else {
+                            L.v("fine location denied");
+                        }
+                    }
+            );
 
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         setContentView(R.layout.preferences_activity);
 
-        String defaultApiKey = getApplicationContext().getResources().getString(R.string.OWM_API_KEY);
+        String defaultApiKey = App.get().getResources().getString(R.string.OWM_API_KEY);
         String currentApiKey = App.preferences().getString("API_KEY", defaultApiKey);
 
         EditText apiKeyEdit = findViewById(R.id.APIEditText);
 
-        apiKeyEdit.setText((currentApiKey.equals("0")?"not set":currentApiKey));
+        apiKeyEdit.setText((currentApiKey.equals("0") ? "not set" : currentApiKey));
 
-        findViewById(R.id.apiKeySetButton).setOnClickListener(v -> ApiKey.setApiKey(apiKeyEdit.getText()));
+        findViewById(R.id.apiKeySetButton).setOnClickListener(v -> {
+            String apiKeyString = v.toString();
+            try {
+                ApiKey.validateAPIKey(apiKeyString);
+                Toast.makeText(App.get(), R.string.api_key_apply_success, Toast.LENGTH_LONG).show();
+                App.preferences().edit().putString("API_KEY", apiKeyString).apply();
+                EventBus.getDefault().post(new ApiKeyUpdate(apiKeyString));
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        });
 
 
         findViewById(R.id.permissionButton).setOnClickListener(v -> requestPermission());
@@ -54,30 +82,12 @@ public class PreferencesActivity extends AppCompatActivity {
         L.d();
     }
 
-
     private void requestPermission() {
-            locationPermissionRequest.launch(new String[] {
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            });
+        locationPermissionRequest.launch(new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+        });
     }
-    ActivityResultLauncher<String[]> locationPermissionRequest =
-            registerForActivityResult(new ActivityResultContracts
-                            .RequestMultiplePermissions(), result -> {
-                        Boolean fineLocationGranted = result.getOrDefault(
-                                Manifest.permission.ACCESS_FINE_LOCATION, false);
-                        Boolean coarseLocationGranted = result.getOrDefault(
-                                Manifest.permission.ACCESS_COARSE_LOCATION,false);
-                        if (fineLocationGranted != null && fineLocationGranted) {
-                            L.v("fine location granted");
-                        } else if (coarseLocationGranted != null && coarseLocationGranted) {
-                            L.v("fine location granted");
-                        } else {
-                            L.v("fine location denied");
-                        }
-                        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("permission_result"));
-                    }
-            );
 
     @Override
     protected void onStop() {

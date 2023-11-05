@@ -83,18 +83,16 @@ public class GradientSet {
         return 0.0f;
     }
 
-    public void lerpUsingDayPercent(float f, boolean bl, Gradient gradient) {
-        this.lerpUsingSlidingIndex(this.calcSlidingIndex(f), bl, gradient);
+    public void lerpUsingDayPercent(float f, Gradient gradient) {
+        this.lerpUsingSlidingIndex(this.calcSlidingIndex(f),  gradient);
     }
 
-    public void lerpUsingSlidingIndex(float f, boolean z, Gradient gradient) {
-        if (z) {
-            f += GradientSetManager.oscillationOffset();
-            if (f < 0.0f) {
-                f += 6.0f;
-            } else if (f >= 6.0f) {
-                f -= 6.0f;
-            }
+    public void lerpUsingSlidingIndex(float f, Gradient gradient) {
+        f += GradientSetManager.oscillationOffset();
+        if (f < 0.0f) {
+            f += 6.0f;
+        } else if (f >= 6.0f) {
+            f -= 6.0f;
         }
         int i = (int) (f + 1.0f);
         Gradient.lerp(this.list.get((int) f), this.list.get(i >= 6 ? 0 : i), Terps.inOut().getInterpolation(f % 1.0f), gradient);

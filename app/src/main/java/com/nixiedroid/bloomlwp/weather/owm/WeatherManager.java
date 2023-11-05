@@ -1,46 +1,44 @@
 package com.nixiedroid.bloomlwp.weather.owm;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.R;
+import com.nixiedroid.bloomlwp.events.ApiKeyUpdate;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.AbstractWeatherManager;
 import com.nixiedroid.bloomlwp.weather.LocationManger;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 public class WeatherManager extends AbstractWeatherManager {
 
     private static final int WEATHER_THROTTLE_MS = 30 * 60 * 1000;
+
     private String API_KEY;
-    private final BroadcastReceiver apiKeyUpdate = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context object, Intent intent) {
-            final String key = intent.getStringExtra("preferences_api_key_update");
-            L.v("got preferences_api_key_update - " + key);
-            API_KEY = key;
-        }
-    };
     private OWMWeatherCode weather = null;
-    public static void updateWeatherNow(){
-       App.preferences().edit().putLong("prevUpdateTime", 0).apply();
+    /** @noinspection unused*/
+    @Subscribe
+    public void onEvent(ApiKeyUpdate event) {
+        final String key = event.getApiKey();
+        L.v("got preferences_api_key_update - " + key);
+        API_KEY = key;
     }
 
-    public WeatherManager(Context context) {
+    public WeatherManager() {
         super();
-        IntentFilter intentFilter = new IntentFilter("preferences_api_key_update");
-        LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.apiKeyUpdate, intentFilter);
+        EventBus.getDefault().register(this);
         API_KEY = App.preferences().getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
         if (API_KEY.equals("0")) {
             L.w("API KEy not set");
             //return;
         }
         L.v("Using API Key: " + API_KEY);
+    }
+
+    public static void updateWeatherNow() {
+        App.preferences().edit().putLong("prevUpdateTime", 0).apply();
     }
 
     private void getWeather(double lat, double lon) {
@@ -95,6 +93,6 @@ public class WeatherManager extends AbstractWeatherManager {
     @Override
     public void destroy() {
         super.destroy();
-        LocalBroadcastManager.getInstance(App.get()).unregisterReceiver(this.apiKeyUpdate);
+        EventBus.getDefault().unregister(this);
     }
 }

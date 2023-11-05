@@ -1,14 +1,10 @@
 package com.nixiedroid.bloomlwp.wallpaper.bloom;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.widget.Toast;
 import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.nixiedroid.bloomlwp.App;
+import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
 import com.nixiedroid.bloomlwp.wallpaper.base.WallpaperService;
@@ -16,19 +12,9 @@ import com.nixiedroid.bloomlwp.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.weather.owm.WeatherManager;
 
 public class BloomWallpaperService
-extends WallpaperService {
+        extends WallpaperService {
     private static BloomWallpaperService instance;
-    private final BroadcastReceiver permissionReceiver = new BroadcastReceiver(){
 
-        @Override
-        public void onReceive(Context object, Intent intent) {
-            L.v("got this - has permission? " );
-            if (ContextCompat.checkSelfPermission(BloomWallpaperService.this, Manifest.permission.ACCESS_COARSE_LOCATION) == 0) {
-                weatherMan.start();
-                sunriseUtil.get();
-            }
-        }
-    };
     private SunriseUtil sunriseUtil;
     private WeatherManager weatherMan;
 
@@ -38,11 +24,16 @@ extends WallpaperService {
 
     private void initPermissionsRelated(Renderer renderer) {
         if (!renderer.isPreview()) {
-            LocalBroadcastManager.getInstance(App.get()).registerReceiver(this.permissionReceiver, new IntentFilter("permission_result"));
-            boolean hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == 0;
+            boolean hasPermission =
+                    ContextCompat.checkSelfPermission(
+                            this, Manifest.permission.ACCESS_COARSE_LOCATION) == 0;
             L.d("has fine location permissions? " + hasPermission);
             if (!hasPermission) {
-                Toast.makeText(App.get(),"No location permission granted. \nPlease, grant it in settings", Toast.LENGTH_LONG).show();
+                Toast.makeText(
+                        App.get(),
+                        R.string.no_permission_warning,
+                        Toast.LENGTH_LONG
+                ).show();
             }
         }
     }
@@ -68,7 +59,7 @@ extends WallpaperService {
         super.onCreate();
         L.d();
         instance = this;
-        this.weatherMan = new WeatherManager(this.getApplicationContext());
+        this.weatherMan = new WeatherManager();
         this.sunriseUtil = new SunriseUtil();
     }
 
@@ -76,7 +67,6 @@ extends WallpaperService {
     public void onDestroy() {
         super.onDestroy();
         this.weatherMan.destroy();
-        LocalBroadcastManager.getInstance(App.get()).unregisterReceiver(this.permissionReceiver);
         instance = null;
     }
 

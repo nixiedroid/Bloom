@@ -1,9 +1,10 @@
 package com.nixiedroid.bloomlwp.weather;
 
-import android.content.Intent;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import com.nixiedroid.bloomlwp.App;
+import com.nixiedroid.bloomlwp.events.SunriseResult;
 import com.nixiedroid.bloomlwp.util.L;
+import org.greenrobot.eventbus.EventBus;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
@@ -11,7 +12,9 @@ public abstract class AbstractSunriseUtil {
     protected float sunriseDayPercent;
     protected float sunsetDayPercent;
 
-    public static float[] getSunriseSunset(float latitude, float longitude) {
+    @NotNull
+    @Contract("_, _ -> new")
+    protected static float[] getSunriseSunset(float latitude, float longitude) {
         CalendarAstronomer calendarAstronomer = new CalendarAstronomer(longitude, latitude);
         long sunRise = calendarAstronomer.getSunRiseSet(true);
         long sunSet = calendarAstronomer.getSunRiseSet(false);
@@ -21,9 +24,7 @@ public abstract class AbstractSunriseUtil {
     }
 
     protected void afterResult() {
-        Intent intent = new Intent("sunrise_result");
-        intent.putExtra("sunrise_result", true);
-        LocalBroadcastManager.getInstance(App.get()).sendBroadcast(intent);
+        EventBus.getDefault().post(new SunriseResult());
     }
 
     protected abstract void doGet();
