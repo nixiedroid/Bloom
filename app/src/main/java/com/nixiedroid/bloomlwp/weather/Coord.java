@@ -21,10 +21,6 @@ public class Coord {
         this.lat = lat;
     }
 
-    public Coord(double lon, double lat) {
-        this.lon = lon;
-        this.lat = lat;
-    }
     public Coord(){}
 
     @Override

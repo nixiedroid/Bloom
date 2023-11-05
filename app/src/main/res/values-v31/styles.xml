@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- inherit from the AppCompat theme -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <!-- your app branding color for the app bar -->
-        <item name="colorPrimary">@android:color/background_light</item>
+        <item name="colorPrimary">@android:color/system_neutral2_800</item>
         <!-- darker variant for the status bar and contextual app bars -->
-        <item name="colorPrimaryDark">@android:color/background_dark</item>
+        <item name="colorPrimaryDark">@android:color/system_neutral2_800</item>
         <!-- theme UI controls like checkboxes and text fields -->
         <item name="colorAccent">#44FF00</item>
     </style>

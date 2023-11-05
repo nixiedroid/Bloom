@@ -8,9 +8,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.concurrent.*;
-import java.util.concurrent.ExecutorService;
 
 public class HttpUrlConnector {
     public static final URL API_URL = Util.constantURL("https://api.openweathermap.org/data/2.5/weather");
@@ -50,13 +49,14 @@ public class HttpUrlConnector {
         return responseCode;
     }
 
+    /** @noinspection CharsetObjectCanBeUsed*/
     private static String readInputStream(final HttpURLConnection connection) throws OWMConnectorException {
         InputStream inputStream = null;
         try {
             final int status = connection.getResponseCode();
             if (status < 400) {
                 inputStream = connection.getInputStream();
-                final String result = Util.toString(inputStream, StandardCharsets.UTF_8);
+                final String result = Util.toString(inputStream, Charset.forName("UTF-8"));
                 if (result.isEmpty()) {
                     throw new OWMConnectorException(ErrorResult.NO_INTERNET);
                 }

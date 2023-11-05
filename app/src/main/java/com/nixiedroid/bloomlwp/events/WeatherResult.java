@@ -1,13 +1,15 @@
 package com.nixiedroid.bloomlwp.events;
 
-public class WeatherResult {
-    private final boolean isOkay;
+import com.nixiedroid.bloomlwp.weather.Result;
 
-    public WeatherResult(boolean isOkay) {
-        this.isOkay = isOkay;
+public class WeatherResult {
+    private final Result result;
+
+    public WeatherResult(Result result) {
+        this.result = result;
     }
 
-    public boolean isOkay() {
-        return isOkay;
+    public Result getResult() {
+        return result;
     }
 }

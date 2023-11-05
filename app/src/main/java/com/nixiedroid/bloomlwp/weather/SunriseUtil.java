@@ -14,8 +14,6 @@ public class SunriseUtil extends AbstractSunriseUtil {
         float longitude = (float) LocationManger.get().getCoord().getLon();
         float[] sunriseSunsetTime = getSunriseSunset(latitude, longitude);
         L.v("sunrise/sunset: " + sunriseSunsetTime[0] + ", " + sunriseSunsetTime[1]);
-        sunriseDayPercent = sunriseSunsetTime[0];
-        sunsetDayPercent = sunriseSunsetTime[1];
         TimeUtil.setSunriseSunsetPercents(sunriseSunsetTime[0], sunriseSunsetTime[1]);
         afterResult();
     }

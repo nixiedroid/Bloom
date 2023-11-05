@@ -4,11 +4,13 @@ import android.app.WallpaperColors;
 import android.graphics.Color;
 import android.opengl.GLES20;
 import android.os.Build;
-import android.view.animation.PathInterpolator;
+import android.view.animation.Interpolator;
+import androidx.core.view.animation.PathInterpolatorCompat;
 import com.nixiedroid.bloomlwp.events.SunriseResult;
 import com.nixiedroid.bloomlwp.events.WeatherResult;
 import com.nixiedroid.bloomlwp.util.*;
 import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
+import com.nixiedroid.bloomlwp.weather.Result;
 import com.nixiedroid.bloomlwp.weather.SunriseUtil;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
 import com.nixiedroid.bloomlwp.weather.WeatherVo;
@@ -55,8 +57,8 @@ public class BloomRenderer
      */
     @Subscribe
     public void weatherReceiver(WeatherResult event) {
-        L.v("got weather broadcast - ");
-        if (event.isOkay()) {
+        L.v("got weather broadcast - " + event.getResult());
+        if (event.getResult() == Result.OKAY) {
             BloomRenderer.this.updateWeatherCondition();
         }
     }
@@ -73,7 +75,7 @@ public class BloomRenderer
     private void initUnlockAnims() {
         this.unlockTopFadeoutAnim = new AnimFloat(1.0f, 0.0f, 1200L, 0L, Terps.linear());
         this.unlockBottomFadeoutAnim = new AnimFloat(1.0f, 0.0f, 1200L, 0L, Terps.linear());
-        PathInterpolator pathInterpolator = new PathInterpolator(0.46f, 0.65f, 0.41f, 0.98f);
+        Interpolator pathInterpolator = PathInterpolatorCompat.create(0.46f, 0.65f, 0.41f, 0.98f);
         this.unlockTopSlideAnim = new AnimFloat(0.0f, 1.0f, 3350L, 0L, pathInterpolator);
         this.unlockBottomSlideAnim = new AnimFloat(0.0f, 1.0f, 3350L, 0L, pathInterpolator);
         this.unlockTopFadeInAnim = new AnimFloat(0.15f, 1.0f, 1000L, Terps.linear());
@@ -93,9 +95,9 @@ public class BloomRenderer
         this.weatherTransitionPercent = MathUtil.normalize(elapsedTimeSinceLastWeatherUpdate, 0.0f, 3000.0f, true);
         float dayPercent = TimeUtil.nowDayPercent();
         if (this.weatherTransitionPercent < 1.0f) {
-            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, this.weatherTransitionPercent, dayPercent,  gradient);
+            this.gradientMan.lerpUsingDayPercent(this.lastWeatherCondition, this.weatherCondition, this.weatherTransitionPercent, dayPercent, gradient);
         } else {
-            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(dayPercent,  gradient);
+            this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingDayPercent(dayPercent, gradient);
             if (this.weatherTransitionPercent != prevWTP) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                     this.engine.notifyColorsChanged();
@@ -114,7 +116,7 @@ public class BloomRenderer
         f = ((float) (n % 6) + f + (float) this.startSlidingIndex) % 6.0f;
         float f2 = this.weatherTransitionPercent;
         if (f2 < 1.0f) {
-            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f,  this.gradient);
+            this.gradientMan.lerpUsingSlidingIndex(this.lastWeatherCondition, this.weatherCondition, f2, f, this.gradient);
         } else {
             this.gradientMan.gradientSetByCondition(this.weatherCondition).lerpUsingSlidingIndex(f, this.gradient);
         }

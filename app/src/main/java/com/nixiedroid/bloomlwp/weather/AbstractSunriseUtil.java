@@ -3,17 +3,11 @@ package com.nixiedroid.bloomlwp.weather;
 import com.nixiedroid.bloomlwp.events.SunriseResult;
 import com.nixiedroid.bloomlwp.util.L;
 import org.greenrobot.eventbus.EventBus;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 
 public abstract class AbstractSunriseUtil {
-    protected float sunriseDayPercent;
-    protected float sunsetDayPercent;
 
-    @NotNull
-    @Contract("_, _ -> new")
     protected static float[] getSunriseSunset(float latitude, float longitude) {
         CalendarAstronomer calendarAstronomer = new CalendarAstronomer(longitude, latitude);
         long sunRise = calendarAstronomer.getSunRiseSet(true);

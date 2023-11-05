@@ -2,6 +2,8 @@ package com.nixiedroid.bloomlwp;
 
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.os.Build;
+import android.os.Debug;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
 
@@ -21,13 +23,16 @@ extends Application {
     public void onCreate() {
         super.onCreate();
         if (!BuildConfig.DEBUG) {
-            android.os.Debug.waitForDebugger();
+            Debug.waitForDebugger();
         }
         instance = this;
-        preferences = createDeviceProtectedStorageContext().getSharedPreferences("cache", 0);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            preferences = createDeviceProtectedStorageContext().getSharedPreferences("cache", 0);
+        } else {
+            preferences = getSharedPreferences("cache", 0);
+        }
         L.d("\n----------------------------------------------------------------------------------");
         TimeUtil.init();
-        FlavorTypeOverride.afterCreate();
     }
 }
 

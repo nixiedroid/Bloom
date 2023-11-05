@@ -2,19 +2,16 @@ package com.nixiedroid.bloomlwp.weather;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.ArraySet;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.events.WeatherResult;
 import com.nixiedroid.bloomlwp.util.L;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 public abstract class AbstractWeatherManager {
     protected boolean isStopped;
     protected Handler pollHandler;
-    protected WeatherVo previousResult;
     protected WeatherVo result;
     protected long resultTime;
 
@@ -24,21 +21,17 @@ public abstract class AbstractWeatherManager {
         isStopped = false;
         runnable = AbstractWeatherManager.this::get;
         pollHandler = new Handler(Looper.getMainLooper());
-        ArraySet<String> defaultResults = new ArraySet<>();
-        defaultResults.add("1");
-        result = this.stringSetToWeather(  App.preferences().getStringSet("weather_condition", defaultResults));
+        String defaultResults = "1";
+        result = this.stringToWeather(App.preferences().getString("weather_condition", defaultResults));
         resultTime = TimeUtil.nowMs();
-        previousResult = this.result;
     }
 
 
-    private WeatherVo stringSetToWeather(Set<String> results) {
-        ArrayList<Integer> resultInteger = new ArrayList<>(results.size());
-        for (String result : results) {
-            try {
-                resultInteger.add(Integer.parseInt(result));
-            } catch (NumberFormatException ignored) {
-            }
+    private WeatherVo stringToWeather(String result) {
+        ArrayList<Integer> resultInteger = new ArrayList<>(1);
+        try {
+            resultInteger.add(Integer.parseInt(result));
+        } catch (NumberFormatException ignored) {
         }
 
         WeatherVo weatherVo = new WeatherVo();
@@ -53,12 +46,12 @@ public abstract class AbstractWeatherManager {
         return weatherVo;
     }
 
-    private Set<String> weatherToStringSet(WeatherVo weatherVo) {
-        ArraySet<String> arraySet = new ArraySet<>();
+    private String weatherToString(WeatherVo weatherVo) {
+        String result = "";
         for (int i = 0; i < weatherVo.conditions.length; ++i) {
-            arraySet.add(Integer.toString(weatherVo.conditions[i]));
+            result = Integer.toString(weatherVo.conditions[i]);
         }
-        return arraySet;
+        return result;
     }
 
     protected void afterResult(Result result) {
@@ -66,11 +59,11 @@ public abstract class AbstractWeatherManager {
     }
 
     protected void afterResult(Result result, WeatherVo weatherVo) {
-        EventBus.getDefault().post(new WeatherResult(result == Result.OKAY));
+        EventBus.getDefault().post(new WeatherResult(result));
         pollHandler.removeCallbacks(runnable);
         pollHandler.postDelayed(runnable, intervalMs());
         if (result == Result.OKAY && weatherVo != null) {
-           App.preferences().edit().putStringSet("weather_condition", this.weatherToStringSet(weatherVo)).apply();
+            App.preferences().edit().putString("weather_condition", this.weatherToString(weatherVo)).apply();
         }
     }
 
@@ -104,16 +97,11 @@ public abstract class AbstractWeatherManager {
     public void destroy() {
         this.isStopped = true;
     }
+
     public void stop() {
         this.isStopped = true;
     }
 
-    public enum Result {
-        OKAY,
-        FAILED,
-        FAILED_NO_PERMISSION,
-        STOPPED
 
-    }
 }
 

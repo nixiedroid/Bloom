@@ -16,6 +16,7 @@ extends Layer {
     private final BloomRenderer renderer;
     private final int textureId;
     private float unlockStartY;
+    /** @noinspection FieldCanBeLocal*/
     private int viewportHeight;
     private int viewportWidth;
     private float y;
@@ -32,11 +33,9 @@ extends Layer {
 
     private void updateAlphas() {
         if (this.isTransitionLayer) {
-            float f = this.renderer.isLockScreen() ? 1.0f : this.renderer.unlockTopFadeoutAnimValue();
-            this.alpha = f;
+            this.alpha = this.renderer.isLockScreen() ? 1.0f : this.renderer.unlockTopFadeoutAnimValue();
         } else {
-            float f = this.renderer.isLockScreen() ? 0.0f : this.renderer.unlockTopFadeInAnimValue();
-            this.alpha = f;
+            this.alpha = this.renderer.isLockScreen() ? 0.0f : this.renderer.unlockTopFadeInAnimValue();
         }
     }
 

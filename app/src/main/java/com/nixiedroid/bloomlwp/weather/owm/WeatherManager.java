@@ -1,13 +1,12 @@
 package com.nixiedroid.bloomlwp.weather.owm;
 
-import android.Manifest;
-import androidx.core.content.ContextCompat;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.events.ApiKeyUpdate;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.AbstractWeatherManager;
 import com.nixiedroid.bloomlwp.weather.LocationManger;
+import com.nixiedroid.bloomlwp.weather.Result;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,9 +36,7 @@ public class WeatherManager extends AbstractWeatherManager {
         L.v("Using API Key: " + API_KEY);
     }
 
-    public static void updateWeatherNow() {
-        App.preferences().edit().putLong("prevUpdateTime", 0).apply();
-    }
+
 
     private void getWeather(double lat, double lon) {
         try {
@@ -55,15 +52,10 @@ public class WeatherManager extends AbstractWeatherManager {
 
     @Override
     protected void doGet() {
-        if (ContextCompat.checkSelfPermission(App.get(), Manifest.permission.ACCESS_COARSE_LOCATION) != 0) {
-            L.w("no permissions");
-            this.afterResult(Result.FAILED_NO_PERMISSION);
-            return;
-        }
         long tempTime = TimeUtil.elapsedRealTimeSince(App.preferences().getLong("prevUpdateTime", 0L));
         if (tempTime < WEATHER_THROTTLE_MS) {
             L.d("Weather Throttling");
-            this.afterResult(Result.STOPPED);
+            this.afterResult(Result.TOO_MANY_REQUESTS);
             return;
         }
         try {
@@ -72,15 +64,14 @@ public class WeatherManager extends AbstractWeatherManager {
             getWeather(latitude, longitude);
             if (weather != null) {
                 result = weather.getWeatherVo();
-                this.previousResult = result;
                 this.resultTime = TimeUtil.nowMs();
                 App.preferences().edit().putLong("prevUpdateTime", resultTime).apply();
-                App.preferences().edit().putString("current_location", latitude + " " + longitude).apply();
                 App.preferences().edit().putString("current_weather_condition", weather.getDescription()).apply();
                 App.preferences().edit().putString("current_weather_update_time", Util.epochToString(resultTime)).apply();
                 L.v("successful result: " + result.toString());
                 afterResult(Result.OKAY, result);
             } else {
+                L.v("failed");
                 afterResult(Result.FAILED);
             }
         } catch (SecurityException var3) {

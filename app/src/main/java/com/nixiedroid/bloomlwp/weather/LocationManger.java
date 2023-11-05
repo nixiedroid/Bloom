@@ -15,6 +15,7 @@ import com.nixiedroid.bloomlwp.util.L;
 
 import java.util.List;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.google.android.gms.common.ConnectionResult.SUCCESS;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -47,12 +48,16 @@ public class LocationManger {
     }
 
     private void updateLocation() {
-        if (!(ContextCompat.checkSelfPermission(App.get(),ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED)) {
-            return;
-        }
+
         if (isGoogleAvailable) {
+            if (!(ContextCompat.checkSelfPermission(App.get(),ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED)) {
+                return;
+            }
             updateLocationGoogle();
         } else {
+            if (!(ContextCompat.checkSelfPermission(App.get(),ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED)) {
+                return;
+            }
             updateLocationNonGoogle();
         }
     }
@@ -67,8 +72,7 @@ public class LocationManger {
             getActiveLocation(LocationManager.NETWORK_PROVIDER);
         }
     }
-
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation","SameParameterValue"})
     @SuppressLint("MissingPermission")
     private void getActiveLocation(String provider) {
         if (locationManager.isProviderEnabled(provider)) {
@@ -88,6 +92,7 @@ public class LocationManger {
 
     private void setLastKnownLocation(Location l) {
         if (l != null) {
+            App.preferences().edit().putString("current_location", l.getLatitude() + " " + l.getLongitude()).apply();
             L.v("LocationManger: lat=" + l.getLatitude() + " lon=" + l.getLongitude());
             lastKnownLocation.setLon(l.getLongitude());
             lastKnownLocation.setLat(l.getLatitude());
