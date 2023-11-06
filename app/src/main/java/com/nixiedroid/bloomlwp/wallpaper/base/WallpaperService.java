@@ -11,9 +11,11 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.hardware.display.DisplayManager;
+import android.os.Build;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
+import androidx.annotation.RequiresApi;
 import androidx.core.view.GestureDetectorCompat;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
@@ -40,7 +42,7 @@ public abstract class WallpaperService
 
     @Override
     public android.service.wallpaper.WallpaperService.Engine onCreateEngine() {
-        return new UtEngine();
+        return new Engine();
     }
 
     @Override
@@ -52,8 +54,7 @@ public abstract class WallpaperService
     protected void onWallpaperAttached(Renderer renderer) {
     }
 
-    public class UtEngine
-            extends GLWallpaperService.GLEngine {
+    public class Engine extends GLWallpaperService.GLEngine {
         private final int displayRotation;
         private final float[] tempGrav = new float[3];
         private DeviceEventsReceiver deviceEventsReceiver;
@@ -65,7 +66,7 @@ public abstract class WallpaperService
         private Renderer renderer;
         private SensorManager sensorManager;
 
-        public UtEngine() {
+        public Engine() {
             this.displayRotation = (
                     (DisplayManager)App.get().getSystemService(Context.DISPLAY_SERVICE)
             ).getDisplay(0).getRotation();
@@ -116,12 +117,16 @@ public abstract class WallpaperService
         }
 
         @Override
+        @RequiresApi(Build.VERSION_CODES.N)
         public WallpaperColors onComputeColors() {
             Renderer renderer = this.renderer;
             if (renderer == null) {
                 return null;
             }
-            return renderer.onComputeWallpaperColors();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                return (WallpaperColors) renderer.onComputeWallpaperColors();
+            }
+            return null;
         }
 
         @Override

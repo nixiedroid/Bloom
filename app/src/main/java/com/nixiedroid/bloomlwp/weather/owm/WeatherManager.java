@@ -31,7 +31,6 @@ public class WeatherManager extends AbstractWeatherManager {
         API_KEY = App.preferences().getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
         if (API_KEY.equals("0")) {
             L.w("API KEy not set");
-            //return;
         }
         L.v("Using API Key: " + API_KEY);
     }

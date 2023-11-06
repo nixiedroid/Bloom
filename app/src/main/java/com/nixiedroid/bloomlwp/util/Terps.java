@@ -2,7 +2,6 @@ package com.nixiedroid.bloomlwp.util;
 
 import android.view.animation.*;
 
-@SuppressWarnings({"SpellCheckingInspection"})
 public class Terps {
     private static final AccelerateInterpolator accelerate05;
     private static final AccelerateDecelerateInterpolator inOut;

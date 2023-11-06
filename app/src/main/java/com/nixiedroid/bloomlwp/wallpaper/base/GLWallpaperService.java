@@ -1,13 +1,12 @@
 package com.nixiedroid.bloomlwp.wallpaper.base;
 
 import android.content.Context;
+import android.opengl.EGL14;
 import android.opengl.GLSurfaceView;
 import android.service.wallpaper.WallpaperService;
 import android.view.SurfaceHolder;
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.egl.EGLDisplay;
+
+import javax.microedition.khronos.egl.*;
 
 public abstract class GLWallpaperService extends WallpaperService {
     protected abstract int defaultGlSurfaceViewRenderMode();
@@ -62,8 +61,8 @@ public abstract class GLWallpaperService extends WallpaperService {
                 return eGL10.eglCreateContext(
                         eGLDisplay,
                         eGLConfig,
-                        EGL10.EGL_NO_CONTEXT,
-                        new int[]{12440, 2, 12544, 12547, 12344});
+                        EGL10.EGL_NO_CONTEXT, new int[]{EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,  12544, 12547, 12344}
+                        );
             }
 
             @Override

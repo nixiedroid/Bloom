@@ -10,13 +10,18 @@ android {
 
     defaultConfig {
         applicationId "com.nixiedroid.bloomlwp"
-        minSdk 17
+        minSdk 23
         targetSdk 34
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField 'boolean', 'ENABLE_CRASHLYTICS', 'true'
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ eventBusIndex : 'com.nixiedroid.bloomlwp.EventBusIndex' ]
+            }
+        }
     }
 
     buildTypes {
@@ -25,11 +30,15 @@ android {
             debuggable false
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField 'boolean', 'DEBUG', 'false'
         }
         benchmark {
             initWith release
             signingConfig signingConfigs.debug
             matchingFallbacks = ['release']
+        }
+        debug {
+            buildConfigField 'boolean', 'DEBUG', 'true'
         }
     }
     compileOptions {
@@ -60,6 +69,7 @@ tasks.register("startRelease") {
 
 
 dependencies {
+    annotationProcessor "org.greenrobot:eventbus-annotation-processor:3.3.1"
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
     implementation("org.greenrobot:eventbus:3.3.1")
     implementation 'androidx.appcompat:appcompat:1.6.1'

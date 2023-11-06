@@ -10,7 +10,6 @@ public class AnimFloat {
     private boolean isRunning = false;
     private long startNs;
     private final float startValue;
-    @SuppressWarnings("SpellCheckingInspection")
     private final Interpolator terp;
 
     public AnimFloat(float startValue, float endValue, long durationS, long delayS, Interpolator interpolator) {
@@ -25,6 +24,7 @@ public class AnimFloat {
         this(startValue, endValue, durationS, 0L, interpolator);
     }
 
+    /** @noinspection BooleanMethodIsAlwaysInverted*/
     public boolean isRunning() {
         return this.isRunning;
     }

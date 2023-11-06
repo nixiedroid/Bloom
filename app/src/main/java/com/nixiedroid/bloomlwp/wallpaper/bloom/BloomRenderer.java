@@ -194,19 +194,19 @@ public class BloomRenderer
     }
 
     @Override
-    public WallpaperColors onComputeWallpaperColors() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            return new WallpaperColors(
-                    Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
-                    Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
-                    Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)), 0);
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                return new WallpaperColors(Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
+    public Object onComputeWallpaperColors() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                return new WallpaperColors(
+                        Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
                         Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
-                        Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)));
+                        Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)), 0);
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                    return new WallpaperColors(Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
+                            Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
+                            Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)));
+                }
             }
-        }
         return null;
     }
 

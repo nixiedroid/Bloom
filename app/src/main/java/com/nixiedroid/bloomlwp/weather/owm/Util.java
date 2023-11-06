@@ -67,8 +67,7 @@ public class Util {
             if (closeable != null) {
                 closeable.close();
             }
-        } catch (final IOException ioe) {
-            // ignore
+        } catch (final IOException ignored) {
         }
     }
 

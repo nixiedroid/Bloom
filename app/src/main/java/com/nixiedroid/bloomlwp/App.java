@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Debug;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
+import org.greenrobot.eventbus.EventBus;
 
 public class App
 extends Application {
@@ -21,6 +22,8 @@ extends Application {
 
     @Override
     public void onCreate() {
+        EventBus.builder().addIndex(new EventBusIndex()).build();
+        EventBus.builder().addIndex(new EventBusIndex()).installDefaultEventBus();
         super.onCreate();
         if (!BuildConfig.DEBUG) {
             Debug.waitForDebugger();

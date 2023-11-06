@@ -8,8 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GradientSet {
-    @SuppressWarnings("unused")
-    private static final String[] labels = new String[]{"NIGHT", "DAWN", "SUNRISE", "DAYTIME", "SUNSET", "DUSK"};
     private final Range dawn;
     private final Range dawnToSunrise;
     private final Range daytime;

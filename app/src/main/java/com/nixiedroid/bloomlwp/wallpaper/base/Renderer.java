@@ -1,11 +1,16 @@
 package com.nixiedroid.bloomlwp.wallpaper.base;
 
-import android.app.WallpaperColors;
 import android.content.Context;
+import android.graphics.Insets;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.display.DisplayManager;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
+import android.view.WindowInsets;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.util.Vec3f;
@@ -14,11 +19,12 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 public abstract class Renderer extends RenderNode implements GLSurfaceView.Renderer {
+    public static final int GL_CPU_OPTIMIZED_QCOM = 36785;
+    private static final int GL_BINNING_CONTROL_HINT_QCOM = 36784;
     private final RenderScheduler scheduler;
     protected int displayHeight;
     protected int displayWidth;
-    protected WallpaperService.UtEngine engine;
-    // protected long fpsStartTime = System.nanoTime();
+    protected WallpaperService.Engine engine;
     protected Vec3f gravity = new Vec3f(0.0f, 0.0f, 1.0f);
     protected float homeOffset;
     protected boolean isLockScreen;
@@ -32,15 +38,31 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
     protected int viewportWidth;
     private boolean isFirstSurfaceRedraw = true;
 
-    @SuppressWarnings("deprecation")
+
     public Renderer() {
         L.d();
         scheduler = new RenderScheduler(this);
-        DisplayManager displayManager = (DisplayManager) App.get().getSystemService(Context.DISPLAY_SERVICE);
-        Point point = new Point();
-        displayManager.getDisplay(0).getSize(point);
-        displayWidth = point.x;
-        displayHeight = point.y;
+        DisplayManager dm = (DisplayManager) App.get().getSystemService(Context.DISPLAY_SERVICE);
+        WindowManager wm = (WindowManager) App.get().getSystemService(Context.WINDOW_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+            WindowInsets windowInsets = windowMetrics.getWindowInsets();
+            Insets insets = windowInsets.getInsetsIgnoringVisibility(
+                    WindowInsets.Type.navigationBars() | WindowInsets.Type.displayCutout());
+
+            int insetsWidth = insets.right + insets.left;
+            int insetsHeight = insets.top + insets.bottom;
+
+            Rect b = windowMetrics.getBounds();
+            displayWidth = b.width() - insetsWidth;
+            displayHeight = b.height() - insetsHeight;
+        } else {
+            Point point = new Point();
+            //noinspection deprecation
+            dm.getDisplay(0).getSize(point);
+            displayWidth = point.x;
+            displayHeight = point.y;
+        }
     }
 
     public int displayShortSide() {
@@ -61,7 +83,7 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
         return isPreview;
     }
 
-    public abstract WallpaperColors onComputeWallpaperColors();
+    public abstract Object onComputeWallpaperColors();
 
     public void onDestroy() {
         L.d();
@@ -70,13 +92,12 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
 
     @Override
     public void onDrawFrame(GL10 gL10) {
-        //Maybe remove nanotime?
         scheduler.onDrawFrameStart();
-        //System.nanoTime();
+        System.nanoTime();
         update();
-        //System.nanoTime();
+        System.nanoTime();
         draw();
-        //System.nanoTime();
+        System.nanoTime();
         scheduler.onDrawFrameEnd();
     }
 
@@ -128,8 +149,9 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
     @Override
     public void onSurfaceCreated(GL10 gL10, EGLConfig eGLConfig) {
         L.d();
-        GLES20.glEnable(36784);
-        GLES20.glHint(36784, 36785);
+
+        GLES20.glEnable(GL_BINNING_CONTROL_HINT_QCOM);
+        GLES20.glHint(GL_BINNING_CONTROL_HINT_QCOM, GL_CPU_OPTIMIZED_QCOM);
     }
 
     public void onSurfaceRedrawNeeded() {
@@ -170,13 +192,14 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
         scheduler.requestRenderNow();
     }
 
-    public void setEngine(WallpaperService.UtEngine utEngine) {
+    public void setEngine(WallpaperService.Engine utEngine) {
         engine = utEngine;
     }
 
     public void setIsPreview(boolean bl) {
         isPreview = bl;
     }
+
     public int viewportHeight() {
         return viewportHeight;
     }

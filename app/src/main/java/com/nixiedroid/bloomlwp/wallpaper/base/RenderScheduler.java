@@ -1,6 +1,7 @@
 package com.nixiedroid.bloomlwp.wallpaper.base;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 
 public class RenderScheduler {
@@ -10,11 +11,11 @@ public class RenderScheduler {
     private long startNs;
     private boolean visible = true;
 
-    @SuppressWarnings("deprecation")
+
     public RenderScheduler(Renderer renderer) {
         runnable = () -> RenderScheduler.this.renderer.glSurfaceView().requestRender();
         this.renderer = renderer;
-        handler = new Handler();
+        handler = new Handler(Looper.getMainLooper());
     }
 
     private void scheduleNext(int millis) {
@@ -50,8 +51,7 @@ public class RenderScheduler {
 
     public void requestRenderNow() {
         renderer.glSurfaceView().requestRender();
-        scheduleNext(this.renderer.frameInterval() << 4);
-        //scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f));
+        scheduleNext((int) ((float) this.renderer.frameInterval() * 16.666666f));
     }
 
     public void setVisible(boolean isVisible) {
