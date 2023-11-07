@@ -1,6 +1,8 @@
 package com.nixiedroid.bloomlwp.weather.owm;
 
+import android.widget.Toast;
 import com.nixiedroid.bloomlwp.App;
+import com.nixiedroid.bloomlwp.BuildConfig;
 import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.events.ApiKeyUpdate;
 import com.nixiedroid.bloomlwp.util.L;
@@ -28,9 +30,18 @@ public class WeatherManager extends AbstractWeatherManager {
     public WeatherManager() {
         super();
         EventBus.getDefault().register(this);
-        API_KEY = App.preferences().getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
-        if (API_KEY.equals("0")) {
-            L.w("API KEy not set");
+        if (BuildConfig.DEBUG) {
+            API_KEY = App.preferences().getString("API_KEY", App.get().getResources().getString(R.string.OWM_API_KEY));
+        } else {
+            API_KEY = App.preferences().getString("API_KEY", "");
+        }
+        if (API_KEY.isEmpty()) {
+            L.w("API key not set");
+            Toast.makeText(
+                    App.get(),
+                    R.string.no_api_key_warning,
+                    Toast.LENGTH_LONG
+            ).show();
         }
         L.v("Using API Key: " + API_KEY);
     }
@@ -44,7 +55,7 @@ public class WeatherManager extends AbstractWeatherManager {
 
             weather = code;
         } catch (OWMConnectorException e) {
-            L.w("Error retrieving weather: " + e.getMessage());
+            L.e("Error retrieving weather: " + e.getMessage());
             weather = null;
         }
     }

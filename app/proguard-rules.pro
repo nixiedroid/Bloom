@@ -20,6 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+#EventBus:
 -keepattributes *Annotation*
 -keepclassmembers class * {
     @org.greenrobot.eventbus.Subscribe <methods>;
@@ -27,5 +28,17 @@
 -keep enum org.greenrobot.eventbus.ThreadMode { *; }
 -keep class org.greenrobot.eventbus.android.AndroidComponentsImpl
 
+#Logging:
 -printusage build/removed_classes.txt
+
+
 -dontobfuscate
+-dontskipnonpubliclibraryclasses
+-forceprocessing
+-optimizationpasses 5
+
+#Remove debug in prod:
+#-assumenosideeffects class android.util.Log {
+#    public static *** d(...);
+#    public static *** v(...);
+#}

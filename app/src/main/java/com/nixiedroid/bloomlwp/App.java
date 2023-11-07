@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Debug;
+import androidx.appcompat.app.AppCompatDelegate;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.weather.TimeUtil;
 import org.greenrobot.eventbus.EventBus;
@@ -22,12 +23,11 @@ extends Application {
 
     @Override
     public void onCreate() {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         EventBus.builder().addIndex(new EventBusIndex()).build();
         EventBus.builder().addIndex(new EventBusIndex()).installDefaultEventBus();
         super.onCreate();
-        if (!BuildConfig.DEBUG) {
-            Debug.waitForDebugger();
-        }
+
         instance = this;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             preferences = createDeviceProtectedStorageContext().getSharedPreferences("cache", 0);

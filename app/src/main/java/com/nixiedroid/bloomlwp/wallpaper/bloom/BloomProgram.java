@@ -8,21 +8,21 @@ import com.nixiedroid.bloomlwp.util.gl.ShaderProgram;
 import com.nixiedroid.bloomlwp.util.gl.TextureUtil;
 
 public class BloomProgram
-extends ShaderProgram {
+        extends ShaderProgram {
     public final int aColorLocation;
     public final int aPositionLocation;
     public final int aTextureCoordinatesLocation;
-    private final LowerGradientLayer lowerLayer;
-    private final float[] matrix = new float[16];
-    private final BloomRenderer renderer;
-    private long startTime;
-    private final LowerGradientLayer transitionLowerLayer;
-    private final UpperGradientLayer transitionUpperLayer;
     public final int uAlpha;
     public final int uMatrixLocation;
     public final int uTextureUnitLocation;
     public final int uTime;
+    private final LowerGradientLayer lowerLayer;
+    private final float[] matrix = new float[16];
+    private final BloomRenderer renderer;
+    private final LowerGradientLayer transitionLowerLayer;
+    private final UpperGradientLayer transitionUpperLayer;
     private final UpperGradientLayer upperLayer;
+    private long startTime;
 
     public BloomProgram(BloomRenderer bloomRenderer) {
         super(App.get(), R.raw.timelapse_vertex_shader, R.raw.timelapse_fragment_shader);
@@ -35,10 +35,8 @@ extends ShaderProgram {
         this.aPositionLocation = GLES20.glGetAttribLocation(this.programId, "aPosition");
         this.aTextureCoordinatesLocation = GLES20.glGetAttribLocation(this.programId, "aTextureCoordinates");
         this.aColorLocation = GLES20.glGetAttribLocation(this.programId, "aColor");
-        int gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_top_gradient_1440 : R.drawable.timelapse_top_gradient_1080;
-        int upperTextureId = TextureUtil.loadTexture(App.get(), gradientResId, false);
-        gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_bottom_gradient_1440 : R.drawable.timelapse_bottom_gradient_1080;
-        int lowerTextureId = TextureUtil.loadTexture(App.get(), gradientResId, false);
+        int upperTextureId = TextureUtil.loadTopTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
+        int lowerTextureId = TextureUtil.loadBottomTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
         this.transitionUpperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, true);
         this.upperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, false);
         this.transitionLowerLayer = new LowerGradientLayer(this.renderer, this, lowerTextureId, true);
@@ -57,7 +55,7 @@ extends ShaderProgram {
         GLES20.glActiveTexture(33984);
         GLES20.glUniform1i(this.uTextureUnitLocation, 0);
         GLES20.glUniformMatrix4fv(this.uMatrixLocation, 1, false, this.matrix, 0);
-        float f = (float)(System.nanoTime() - this.startTime) / 1.0E-9f;
+        float f = (float) (System.nanoTime() - this.startTime) / 1.0E-9f;
         GLES20.glUniform1f(this.uTime, f);
     }
 

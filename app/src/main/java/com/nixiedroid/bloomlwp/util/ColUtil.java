@@ -21,8 +21,12 @@ public class ColUtil {
         return Color.rgb((int)(colorArray[0] * 255.0f), (int)(colorArray[1] * 255.0f), (int)(colorArray[2] * 255.0f));
     }
 
+
     public static float[] stringToRgb(String string2) {
         return ColUtil.intToRgb(Color.parseColor(string2));
+    }
+    public static int stringToArgb(String string2) {
+        return Color.parseColor(string2);
     }
 }
 

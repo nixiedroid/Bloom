@@ -2,15 +2,15 @@
     <string name="app_name">Bloom LWP</string>
     <string name="OWM_API_KEY">KEY</string>
     <string name="permissions_activity_label"/>
-    <string name="bloom_description">Watch your day unfold in beautiful gradients as Time Lapse reacts to time and
-        weather conditions.
-    </string>
+    <string name="bloom_description">Watch throught blurry window representing current time and weather condition</string>
     <string name="bloom_label">Bloom Wallpaper</string>
-    <string name="collection_label">Live data series</string>
     <string name="button_location_dialog">Permit location access</string>
     <string name="button_set_api_key">Set API KEY</string>
     <string name="button_update_weather">Update weather conditions now</string>
-    <string name="api_key_apply_success">api key apply success</string>
+    <string name="api_key_apply_success">Api key apply success</string>
+    <string name="api_key_apply_failed">Invalid api key</string>
     <string name="no_permission_warning">No location permission granted.
-        Please, grant it in settings</string>
+        Please, grant it in app settings</string>
+    <string name="no_api_key_warning">Invalid API key.
+        Please, set it in app settings</string>
 </resources>

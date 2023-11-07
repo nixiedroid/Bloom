@@ -3,6 +3,7 @@ package com.nixiedroid.bloomlwp.preferences;
 import android.Manifest;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,22 +59,9 @@ public class PreferencesActivity extends AppCompatActivity {
         super.onCreate(bundle);
         setContentView(R.layout.preferences_activity);
 
-        String defaultApiKey = App.get().getResources().getString(R.string.OWM_API_KEY);
-        String currentApiKey = App.preferences().getString("API_KEY", defaultApiKey);
+        ((EditText) findViewById(R.id.APIEditText)).setText(App.preferences().getString("API_KEY",""));
 
-        EditText apiKeyEdit = findViewById(R.id.APIEditText);
-
-        apiKeyEdit.setText((currentApiKey.equals("0") ? "not set" : currentApiKey));
-
-        findViewById(R.id.apiKeySetButton).setOnClickListener(v -> {
-            String apiKeyString = v.toString();
-            if (apiKeyString.length() == 32) {
-                Toast.makeText(App.get(), R.string.api_key_apply_success, Toast.LENGTH_LONG).show();
-                App.preferences().edit().putString("API_KEY", apiKeyString).apply();
-                EventBus.getDefault().post(new ApiKeyUpdate(apiKeyString));
-            }
-        });
-
+        findViewById(R.id.apiKeySetButton).setOnClickListener(this::setApiKey);
 
         findViewById(R.id.permissionButton).setOnClickListener(v -> requestPermission());
 
@@ -95,6 +83,16 @@ public class PreferencesActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         L.d();
+    }
+    private void setApiKey(View view){
+        String apiKeyString = view.toString();
+        if (apiKeyString.length() == 32) {
+            Toast.makeText(App.get(), R.string.api_key_apply_success, Toast.LENGTH_LONG).show();
+            App.preferences().edit().putString("API_KEY", apiKeyString).apply();
+            EventBus.getDefault().post(new ApiKeyUpdate(apiKeyString));
+        } else {
+            Toast.makeText(App.get(), R.string.api_key_apply_failed, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void requestPermission() {

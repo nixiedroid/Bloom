@@ -2,11 +2,13 @@ package com.nixiedroid.bloomlwp.wallpaper.bloom;
 
 import android.Manifest;
 import android.os.Build;
+import android.os.Debug;
 import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.nixiedroid.bloomlwp.App;
+import com.nixiedroid.bloomlwp.BuildConfig;
 import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
@@ -67,6 +69,7 @@ public class BloomWallpaperService
         }
     }
 
+
     @Override
     protected boolean handlesGravity() {
         return true;
@@ -84,7 +87,9 @@ public class BloomWallpaperService
 
     @Override
     public void onCreate() {
-
+        if (BuildConfig.DEBUG) {
+            Debug.waitForDebugger();
+        }
         super.onCreate();
         L.d();
         instance = this;

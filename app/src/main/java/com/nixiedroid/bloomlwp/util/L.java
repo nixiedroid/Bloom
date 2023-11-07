@@ -7,7 +7,7 @@ public class L {
     public static boolean decorationEnabled = true;
     public static int levelFilter = 0;
 
-    public L() {
+    static {
         if (!BuildConfig.DEBUG) {
             levelFilter = 3;
         }

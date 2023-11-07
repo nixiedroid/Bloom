@@ -38,7 +38,7 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
     protected int viewportWidth;
     private boolean isFirstSurfaceRedraw = true;
 
-
+    @SuppressWarnings("deprecation")
     public Renderer() {
         L.d();
         scheduler = new RenderScheduler(this);
@@ -58,7 +58,6 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
             displayHeight = b.height() - insetsHeight;
         } else {
             Point point = new Point();
-            //noinspection deprecation
             dm.getDisplay(0).getSize(point);
             displayWidth = point.x;
             displayHeight = point.y;
@@ -206,6 +205,14 @@ public abstract class Renderer extends RenderNode implements GLSurfaceView.Rende
 
     public int viewportWidth() {
         return viewportWidth;
+    }
+
+    public int getDisplayHeight() {
+        return displayHeight;
+    }
+
+    public int getDisplayWidth() {
+        return displayWidth;
     }
 }
 
