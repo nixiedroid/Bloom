@@ -3,13 +3,13 @@ package com.nixiedroid.bloomlwp.wallpaper.bloom;
 import android.Manifest;
 import android.os.Build;
 import android.os.Debug;
-import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.BuildConfig;
 import com.nixiedroid.bloomlwp.R;
+import com.nixiedroid.bloomlwp.info.ToastWrapper;
 import com.nixiedroid.bloomlwp.util.L;
 import com.nixiedroid.bloomlwp.wallpaper.base.Renderer;
 import com.nixiedroid.bloomlwp.wallpaper.base.WallpaperService;
@@ -56,11 +56,7 @@ public class BloomWallpaperService
             }
             L.d("has fine location permissions? " + hasPermission);
             if (!hasPermission) {
-                Toast.makeText(
-                        App.get(),
-                        R.string.no_permission_warning,
-                        Toast.LENGTH_LONG
-                ).show();
+                ToastWrapper.showToast(R.string.no_permission_warning);
             } else {
                 weatherMan.start();
                 sunriseUtil.get();

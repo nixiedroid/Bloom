@@ -1,6 +1,8 @@
 package com.nixiedroid.bloomlwp.weather.owm;
 
 
+import com.nixiedroid.bloomlwp.R;
+import com.nixiedroid.bloomlwp.info.ToastWrapper;
 import com.nixiedroid.bloomlwp.weather.owm.enums.ErrorResult;
 
 import java.io.IOException;
@@ -67,6 +69,7 @@ public class HttpUrlConnector {
                 }
                 return result;
             } else if (status == HttpURLConnection.HTTP_UNAUTHORIZED || status == HttpURLConnection.HTTP_FORBIDDEN) {
+                ToastWrapper.showToast(R.string.no_api_key_warning);
                 throw new OWMConnectorException(ErrorResult.INVALID_API_KEY);
             } else if (status == 429) {
                 throw new OWMConnectorException(ErrorResult.INTERNAL_TOO_MUCH_REQUESTS);
