@@ -56,6 +56,7 @@ public class WeatherManager extends AbstractWeatherManager {
             weather = code;
         } catch (OWMConnectorException e) {
             L.e("Error retrieving weather: " + e.getMessage());
+            Toast.makeText(App.get(),e.getMessage(),Toast.LENGTH_LONG).show();
             weather = null;
         }
     }

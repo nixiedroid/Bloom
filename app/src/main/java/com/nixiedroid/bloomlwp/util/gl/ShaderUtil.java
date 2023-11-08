@@ -1,6 +1,5 @@
 package com.nixiedroid.bloomlwp.util.gl;
 
-import android.content.Context;
 import android.opengl.GLES20;
 import com.nixiedroid.bloomlwp.util.L;
 
@@ -59,10 +58,10 @@ public class ShaderUtil {
     }
 
 
-    public static int makeProgram(Context context, int vertexShaderResId, int fragmentShaderResId) {
+    public static int makeProgram(int vertexShaderResId, int fragmentShaderResId) {
         return ShaderUtil.buildProgram(
-                TextResourceReader.readTextFileFromResource(context, vertexShaderResId),
-                TextResourceReader.readTextFileFromResource(context, fragmentShaderResId)
+                TextResourceReader.readTextFileFromResource(vertexShaderResId),
+                TextResourceReader.readTextFileFromResource(fragmentShaderResId)
         );
     }
 

@@ -85,7 +85,8 @@ public class PreferencesActivity extends AppCompatActivity {
         L.d();
     }
     private void setApiKey(View view){
-        String apiKeyString = view.toString();
+        EditText et = findViewById(R.id.APIEditText);
+        String apiKeyString = String.valueOf(et.getText());
         if (apiKeyString.length() == 32) {
             Toast.makeText(App.get(), R.string.api_key_apply_success, Toast.LENGTH_LONG).show();
             App.preferences().edit().putString("API_KEY", apiKeyString).apply();

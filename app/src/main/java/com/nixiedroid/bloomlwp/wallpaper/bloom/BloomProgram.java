@@ -2,7 +2,6 @@ package com.nixiedroid.bloomlwp.wallpaper.bloom;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import com.nixiedroid.bloomlwp.App;
 import com.nixiedroid.bloomlwp.R;
 import com.nixiedroid.bloomlwp.util.gl.ShaderProgram;
 import com.nixiedroid.bloomlwp.util.gl.TextureUtil;
@@ -25,7 +24,7 @@ public class BloomProgram
     private long startTime;
 
     public BloomProgram(BloomRenderer bloomRenderer) {
-        super(App.get(), R.raw.timelapse_vertex_shader, R.raw.timelapse_fragment_shader);
+        super(R.raw.timelapse_vertex_shader, R.raw.timelapse_fragment_shader);
         this.renderer = bloomRenderer;
         this.startTime = System.nanoTime();
         this.uMatrixLocation = GLES20.glGetUniformLocation(this.programId, "uMatrix");
@@ -35,8 +34,14 @@ public class BloomProgram
         this.aPositionLocation = GLES20.glGetAttribLocation(this.programId, "aPosition");
         this.aTextureCoordinatesLocation = GLES20.glGetAttribLocation(this.programId, "aTextureCoordinates");
         this.aColorLocation = GLES20.glGetAttribLocation(this.programId, "aColor");
-        int upperTextureId = TextureUtil.loadTopTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
-        int lowerTextureId = TextureUtil.loadBottomTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
+
+        int gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_top_gradient_1440 : R.drawable.timelapse_top_gradient_1080;
+        int upperTextureId = TextureUtil.loadTexture( gradientResId);
+        gradientResId = this.renderer.displayShortSide() > 1080 ? R.drawable.timelapse_bottom_gradient_1440 : R.drawable.timelapse_bottom_gradient_1080;
+        int lowerTextureId = TextureUtil.loadTexture( gradientResId);
+
+       // int upperTextureId = TextureUtil.loadTopTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
+       // int lowerTextureId = TextureUtil.loadBottomTexture(renderer.getDisplayWidth(), renderer.getDisplayHeight());
         this.transitionUpperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, true);
         this.upperLayer = new UpperGradientLayer(this.renderer, this, upperTextureId, false);
         this.transitionLowerLayer = new LowerGradientLayer(this.renderer, this, lowerTextureId, true);

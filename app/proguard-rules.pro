@@ -31,7 +31,7 @@
 #Logging:
 -printusage build/removed_classes.txt
 
-
+-printconfiguration
 -dontobfuscate
 -dontskipnonpubliclibraryclasses
 -forceprocessing

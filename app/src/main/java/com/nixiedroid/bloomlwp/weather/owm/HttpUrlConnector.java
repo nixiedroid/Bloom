@@ -43,8 +43,13 @@ public class HttpUrlConnector {
         OWMWeatherCode responseCode;
         try {
             responseCode = cod.get();
-        } catch (ExecutionException | InterruptedException | CancellationException e) {
+        } catch (InterruptedException | CancellationException e) {
             throw new OWMConnectorException(e.getMessage());
+        } catch (ExecutionException e){
+            if (e.getCause() != null && e.getCause() instanceof OWMConnectorException) {
+                throw (OWMConnectorException) e.getCause();
+            }
+           throw new OWMConnectorException(e.getMessage());
         }
         return responseCode;
     }
