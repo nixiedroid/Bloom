@@ -197,9 +197,9 @@ public class BloomRenderer
     public Object onComputeWallpaperColors() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 int hints =0;
-                if (ColUtil.isWhite(this.gradient.upper1) || ColUtil.isWhite(this.gradient.upper2)) hints = WallpaperColors.HINT_SUPPORTS_DARK_TEXT;
+                if (ColUtil.isWhite(this.gradient.middle)) hints = WallpaperColors.HINT_SUPPORTS_DARK_TEXT;
                 return new WallpaperColors(
-                        Color.valueOf(ColUtil.rgbToInt(this.gradient.lower2)),
+                        Color.valueOf(ColUtil.rgbToInt(this.gradient.upper1)),
                         Color.valueOf(ColUtil.rgbToInt(this.gradient.lower1)),
                         Color.valueOf(ColUtil.rgbToInt(this.gradient.middle)), hints);
             } else {
