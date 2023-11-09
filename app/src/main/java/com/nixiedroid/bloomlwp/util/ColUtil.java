@@ -20,13 +20,14 @@ public class ColUtil {
     public static int rgbToInt(float[] colorArray) {
         return Color.rgb((int)(colorArray[0] * 255.0f), (int)(colorArray[1] * 255.0f), (int)(colorArray[2] * 255.0f));
     }
+    public static boolean isWhite( float[] color){
+        double darkness = 1-(0.299*color[0] + 0.587*color[1] + 0.114*color[2]);
+        return darkness < 0.5;
+    }
 
 
     public static float[] stringToRgb(String string2) {
         return ColUtil.intToRgb(Color.parseColor(string2));
-    }
-    public static int stringToArgb(String string2) {
-        return Color.parseColor(string2);
     }
 }
 
