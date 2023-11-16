@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.view.animation.Interpolator;
+import androidx.annotation.RequiresApi;
 import androidx.core.view.animation.PathInterpolatorCompat;
 import com.nixiedroid.bloomlwp.events.SunriseResult;
 import com.nixiedroid.bloomlwp.events.WeatherResult;
@@ -194,6 +195,7 @@ public class BloomRenderer
     }
 
     @Override
+    @RequiresApi(Build.VERSION_CODES.N)
     public Object onComputeWallpaperColors() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 int hints =0;

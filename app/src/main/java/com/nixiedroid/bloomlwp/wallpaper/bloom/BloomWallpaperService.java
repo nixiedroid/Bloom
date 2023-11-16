@@ -83,9 +83,6 @@ public class BloomWallpaperService
 
     @Override
     public void onCreate() {
-        if (BuildConfig.DEBUG) {
-            Debug.waitForDebugger();
-        }
         super.onCreate();
         L.d();
         instance = this;
